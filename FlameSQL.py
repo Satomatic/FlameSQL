@@ -51,7 +51,7 @@ def MainProgram(hostname, username, password):
 		
 		global database
 		database = selected
-		
+
 		conn = MySQLdb.connect(hostname, username, password, selected)
 		cursor = conn.cursor()
 		cursor.execute("show tables")
@@ -69,7 +69,117 @@ def MainProgram(hostname, username, password):
 		order_by = ""
 	
 		DropTableButton.config(state='normal')
-	
+
+		def InsertRow():
+			insertwindow = Tk()
+
+			insertwindow.title("Insert Row")
+			insertwindow.geometry("400x430")
+			insertwindow.resizable(0,0)
+			insertwindow.iconbitmap("Resources/icon.ico")
+
+			def RowSubmit():
+				item_array = []
+				count = 0
+				for item in MainContainer.winfo_children():
+					item_name = str(item)
+					if "label" in item_name:
+						pass
+					else:
+						column_data = row_array[count]
+						print(column_data)
+
+						dataSplit = column_data.split("::")
+						data_type = dataSplit[1]
+
+						print(data_type)
+
+						item_data = item.get()
+						if data_type == "text":
+							item_array.insert(len(item_array), "'" + item_data + "'")
+						else:
+							item_array.insert(len(item_array), item_data)
+
+						count = count + 1
+
+				sql_command = "insert into " + tablename + " ("
+				count = 0
+				for item in row_array:
+					itemSplit = item.split("::")
+					itemSplitName = itemSplit[0]
+
+					sql_command = sql_command + itemSplitName
+					count = count + 1
+					if count == len(row_array):
+						sql_command = sql_command + ") values ("
+					else:
+						sql_command = sql_command + ", "
+				print(sql_command)
+
+				count = 0
+				for item in item_array:
+					sql_command = sql_command + item
+					count = count + 1
+					if count == len(item_array):
+						sql_command = sql_command + ")"
+					else:
+						sql_command = sql_command + ","
+				print(sql_command)
+
+				conn = MySQLdb.connect(hostname, username, password, database)
+				cursor = conn.cursor()
+				cursor.execute(sql_command)
+				conn.commit()
+
+			# Use tablename var
+
+			Label(insertwindow, text="\nInsert row\n", font=("", 11)).pack(fill=X)
+			MainContainer = Frame(insertwindow, bd=2, relief=RIDGE)
+			MainContainer.pack(fill=BOTH, expand=1)
+
+			# Get column information
+			global database
+
+			conn = MySQLdb.connect(hostname, username, password, database)
+			cursor = conn.cursor()
+			cursor.execute("show columns from " + tablename)
+			server_return = cursor.fetchall()
+			print(server_return)
+
+			row_array = []
+
+			for row in server_return:
+				column_name = row[0]
+				column_type = row[1]
+
+				row_array.insert(len(row_array), column_name + "::" + column_type)
+			print(row_array)
+
+			cursor.close()
+			conn.close()
+
+			# Draw stuff
+			init_pos_y = 10
+			add_value = 30
+
+			for item in row_array:
+				init_pos_y = init_pos_y + add_value
+				Label(MainContainer, text=item, font=("", 11)).place(x=10, y=init_pos_y)
+
+				data_entry = Entry(MainContainer, font=("", 10), bd=2, relief=RIDGE, width=30)
+				data_entry.place(x=90, y=init_pos_y)
+
+			for widget in MainContainer.winfo_children():
+				print(str(widget))
+
+			FooterPanel = Frame(insertwindow, height=30)
+			FooterPanel.pack(fill=X)
+
+			Button(FooterPanel, text="Submit", bd=2, relief=RIDGE, width=10, command=RowSubmit).place(x=1, y=1)
+			Button(FooterPanel, text="close", bd=2, relief=RIDGE, width=10, command=insertwindow.destroy).place(x=90, y=1)
+
+			insertwindow.mainloop()
+
 		def DrawTable(table):
 			column_array = []
 			
@@ -80,7 +190,7 @@ def MainProgram(hostname, username, password):
 			column_raw = cursor.fetchall()
 			for item in column_raw:
 				column_name = item[0]
-				column_array.insert(0, column_name)
+				column_array.insert(len(column_array), column_name)
 			
 			# Get table data #
 			cursor.execute("select * from " + table)
@@ -115,7 +225,7 @@ def MainProgram(hostname, username, password):
 		ControlPanel = PanedWindow(MainWorkspace, height=25, bd=2, relief=GROOVE)
 		ControlPanel.pack(fill=X)
 		
-		Button(ControlPanel, text="Insert row", width=10, bd=0).pack(side=LEFT)
+		Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow).pack(side=LEFT)
 		Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled').pack(side=LEFT)
 		
 		#Label(TopPanel, text="Order by", font=("", 10)).place(x=250, y=0)
@@ -238,8 +348,10 @@ def MainProgram(hostname, username, password):
 				else:
 					treeview.insert('', 'end', values=((fieldname, fieldtype)))
 					
-					field_array.insert(1, fieldname + " " + fieldtype)	
-			
+					field_array.insert(len(field_array), fieldname + " " + fieldtype)
+
+				print(field_array)
+
 			# Load data types #
 			field_type_array = []
 			data_type_raw = linecache.getline("Data/SQLData.dat", 1).strip("\n")
@@ -536,7 +648,7 @@ def Login():
 		add_placeholder_to(HostnameE, "Hostname", "")
 		add_placeholder_to(UsernameE, "Username", "")
 		add_placeholder_to(PasswordE, "Password", "*")
-		
+
 		HostnameE.bind("<Return>", Connect)
 		UsernameE.bind("<Return>", Connect)
 		PasswordE.bind("<Return>", Connect)

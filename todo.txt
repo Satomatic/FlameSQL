@@ -1,0 +1,6 @@
+DONE: Fix table adding
+DONE: Fix inverted table display
+TODO: Add debug logs
+DONE: Insert row
+TODO: Delete row
+TODO: Check all insert data tyles
