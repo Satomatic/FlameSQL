@@ -5,6 +5,7 @@ from tkinter import filedialog
 from Lib.Saphire import *
 import linecache
 import MySQLdb
+import time
 import sys
 import os
 
@@ -17,15 +18,80 @@ def Exit():
 def Logout(window):
 	window.destroy()
 	Login()
-		
+
 def MainProgram(hostname, username, password):
 	window = Tk()
 	
-	window.title("FlameSQL")
+	window.title("FlameSQL :: " + hostname)
 	window.geometry("1280x720")
 	window.iconbitmap("Resources/icon.ico")
 	window.protocol('WM_DELETE_WINDOW', Exit)
-	
+
+	def ServerInfo():
+		serverinfo = Tk()
+
+		serverinfo.title("FlameSQL Server Info")
+		serverinfo.geometry("500x500")
+		serverinfo.resizable(0,0)
+		serverinfo.iconbitmap("Resources/icon.ico")
+		centerwindow(serverinfo)
+
+		def ServerInfoFuntion():
+			for widget in serverinfo.winfo_children():
+				widget.destroy()
+
+			def ServerShutdown():
+				if messagebox.askyesno("Shutdown", "Are you sure you would like\nto shut down the server?"):
+					try:
+						conn = MySQLdb.connect(hostname, username, password)
+						conn.shutdown()
+						conn.close()
+					except (MySQLdb.Error, MySQLdb.Warning) as e:
+						error = str(e).strip("(").strip(")")
+						datasplit = error.split(", ")
+						messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
+					serverinfo.destroy()
+					Logout(window)
+				else:
+					pass
+
+			# Get server stats
+			conn = MySQLdb.connect(hostname, username, password)
+			statRaw = conn.stat()
+			conn.close()
+
+			statArray = statRaw.split("  ")
+			print(statArray)
+
+			headerPanel = PanedWindow(serverinfo, bd=2, relief=RIDGE)
+			headerPanel.pack(fill=X)
+			Label(headerPanel, text=" Server manager", font=("", 10), height=2).pack(side=LEFT)
+			Button(headerPanel, text="refresh", font=("", 10), bd=0, command=ServerInfoFuntion).pack(side=RIGHT)
+			Button(headerPanel, text="shutdown", font=("", 10), bd=0, command=ServerShutdown).pack(side=RIGHT)
+
+			infoPanel = PanedWindow(serverinfo, bd=2, relief=RIDGE)
+			infoPanel.pack(fill=BOTH, expand=1)
+
+			Label(infoPanel, text="Hostname\n\nUptime\nThreads\nQuestions\nSlow queries\nOpens\nFlush tables\nOpen tables\nQueries per second avg",
+				  font=("", 10), anchor=W, justify=LEFT).place(x=10, y=10)
+
+			infoText = hostname + "\n\n"
+			for item in statArray:
+				itemsplit = item.split(": ")
+				if itemsplit[0] == "Uptime":
+					time_convert = time.strftime('%H:%M:%S', time.localtime(int(itemsplit[1])))
+					infoText = infoText + itemsplit[1] + " (" + time_convert + ")" + "\n"
+				else:
+					infoText = infoText + itemsplit[1] + "\n"
+
+			Label(infoPanel, text=infoText, font=("", 10), anchor=W, justify=LEFT).place(x=180, y=10)
+
+			Label(infoPanel, )
+
+			serverinfo.mainloop()
+
+		ServerInfoFuntion()
+
 	def GetDatabases():
 		conn = MySQLdb.connect(hostname, username, password)
 		cursor = conn.cursor()
@@ -42,7 +108,7 @@ def MainProgram(hostname, username, password):
 			
 		cursor.close()
 		conn.close()
-	
+
 	def DatabaseLoad(event):
 		select = DatabaseListbox.get(DatabaseListbox.curselection())
 		selected = str(select[0])
@@ -66,8 +132,6 @@ def MainProgram(hostname, username, password):
 			TableListbox.insert(END, "No tables found")
 		
 	def TableLoad(event):
-		order_by = ""
-	
 		DropTableButton.config(state='normal')
 
 		def InsertRow():
@@ -114,6 +178,7 @@ def MainProgram(hostname, username, password):
 						sql_command = sql_command + ") values ("
 					else:
 						sql_command = sql_command + ", "
+
 				print(sql_command)
 
 				count = 0
@@ -130,8 +195,9 @@ def MainProgram(hostname, username, password):
 				cursor = conn.cursor()
 				cursor.execute(sql_command)
 				conn.commit()
+				conn.close()
 
-			# Use tablename var
+
 
 			Label(insertwindow, text="\nInsert row\n", font=("", 11)).pack(fill=X)
 			MainContainer = Frame(insertwindow, bd=2, relief=RIDGE)
@@ -153,7 +219,6 @@ def MainProgram(hostname, username, password):
 				column_type = row[1]
 
 				row_array.insert(len(row_array), column_name + "::" + column_type)
-			print(row_array)
 
 			cursor.close()
 			conn.close()
@@ -181,10 +246,25 @@ def MainProgram(hostname, username, password):
 			insertwindow.mainloop()
 
 		def DrawTable(table):
+			def GetSelectedRow(event):
+				selected = treeview.item(treeview.selection())
+				print(type(selected))
+				print(selected)
+				item = treeview.selection()[0]
+				values = treeview.item(item)['values']
+				selection_array = []
+				for item in values:
+					item = str(item)
+					selection_array.insert(len(selection_array), item)
+					print(selection_array)
+
+				#DeleteRowButton.config(state='normal', command=lambda: DeleteRow())
+
 			column_array = []
 			
 			conn = MySQLdb.connect(hostname, username, password, database)
 			cursor = conn.cursor()
+
 			# Get column names #
 			cursor.execute("show columns from " + table)
 			column_raw = cursor.fetchall()
@@ -212,9 +292,15 @@ def MainProgram(hostname, username, password):
 			# Insert data to table #
 			for row in table_raw:
 				treeview.insert('', 'end', values=row)
+
+			treeview.bind("<ButtonRelease-1>", GetSelectedRow)
 	
 		ClearPanel(MainWorkspace)
-		tablename = TableListbox.get(TableListbox.curselection())
+		if "load_table::" in str(event):
+			tablename = event.strip("load_table::")
+		else:
+			tablename = TableListbox.get(TableListbox.curselection())
+
 		
 		# Top Panel #
 		TopPanel = Frame(MainWorkspace, height=25, bd=2, relief=GROOVE)
@@ -226,7 +312,8 @@ def MainProgram(hostname, username, password):
 		ControlPanel.pack(fill=X)
 		
 		Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow).pack(side=LEFT)
-		Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled').pack(side=LEFT)
+		DeleteRowButton = Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled')
+		DeleteRowButton.pack(side=LEFT)
 		
 		#Label(TopPanel, text="Order by", font=("", 10)).place(x=250, y=0)
 		
@@ -448,11 +535,16 @@ def MainProgram(hostname, username, password):
 			pass
 			
 		DropTableButton.config(state='disabled')
-	
+
 	# Menu bar #
 	menubar = Menu(window)
 	menubar.add_command(label="Users")
-	menubar.add_command(label="Server")
+
+	servermenu = Menu(menubar, tearoff=0)
+	servermenu.add_command(label="Server manager", command=ServerInfo)
+	servermenu.add_command(label="Export stats")
+	menubar.add_cascade(label="Server", menu=servermenu)
+
 	menubar.add_command(label="Logout", command=lambda: Logout(window))
 	menubar.add_command(label="Exit", command=Exit)
 	window.configure(menu=menubar)
@@ -464,10 +556,15 @@ def MainProgram(hostname, username, password):
 	TitlePanel.pack(fill=X)
 	DBContainer = Frame(SidePanel, height=25, width=150)
 	DBContainer.pack(fill=BOTH, expand=1)
+	#DBContainerBottom = Frame(SidePanel, height=25, width=100, bd=2, relief=RIDGE)
+	#DBContainerBottom.pack(fill=X)
 	TitlePanel2 = Frame(SidePanel, height=25, width=150)
 	TitlePanel2.pack(fill=X)
 	TBContainer = Frame(SidePanel, height=25, width=150)
 	TBContainer.pack(fill=BOTH, expand=1)
+
+	#ExportButton = Button(DBContainerBottom, text="Export database", font=("", 10), width=15, height=1, bd=0, state='disabled')
+	#ExportButton.pack(side=LEFT)
 	
 	# Database list #
 	DropDatabaseButton = Button(TitlePanel, text="-", font=("", 11), width=5, height=1, bd=0, state='disabled', command=DropDatabase)
@@ -500,6 +597,10 @@ def MainProgram(hostname, username, password):
 	# Main workspace #
 	MainWorkspace = Frame(window, bd=2, relief=RIDGE)
 	MainWorkspace.pack(fill=BOTH, expand=1)
+
+	# Bottom panel
+	BottomPanel = Frame(window, height=40, bd=2, relief=RIDGE)
+	BottomPanel.pack(fill=X)
 	
 	# Run on GUI load #
 	GetDatabases()
@@ -529,6 +630,8 @@ def Login():
 				Password = DataSplit[2]
 				
 				SavedListbox.insert(END, Username + "@" + Hostname)
+
+			SaveFile.close()
 		else:
 			SaveFile = open("Data/Saved.dat", "w")
 			SaveFile.close()
@@ -632,6 +735,7 @@ def Login():
 						error = str(e).strip("(").strip(")")
 						datasplit = error.split(", ")
 						messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
+			SaveFile.close()
 	
 		Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
 		HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
@@ -675,6 +779,4 @@ def Login():
 	
 	window.mainloop()
 
-
-# Stuff to run on startup #
 Login()

@@ -54,5 +54,5 @@ def centerwindow(win):
     win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
 def ClearPanel(panel):
-	for widget in panel.winfo_children():
-		widget.destroy()
+    for widget in panel.winfo_children():
+        widget.destroy()

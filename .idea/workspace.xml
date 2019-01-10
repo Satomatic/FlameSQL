@@ -11,44 +11,45 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FlameSQL.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="FlameSQL.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FlameSQL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="128" column="16" lean-forward="false" selection-start-line="128" selection-start-column="16" selection-end-line="128" selection-end-column="16" />
+            <state relative-caret-position="17">
+              <caret line="602" column="28" lean-forward="false" selection-start-line="602" selection-start-column="28" selection-end-line="602" selection-end-column="28" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
+                <element signature="e#220#320#0" expanded="false" />
+                <element signature="e#343#368#0" expanded="false" />
+                <element signature="e#610#2766#0" expanded="false" />
+                <element signature="e#2791#3155#0" expanded="false" />
+                <element signature="e#3185#3710#0" expanded="false" />
+                <element signature="e#3801#6685#0" expanded="false" />
+                <element signature="e#8942#10140#0" expanded="false" />
+                <element signature="e#10163#14455#0" expanded="false" />
+                <element signature="e#14481#15252#0" expanded="false" />
+                <element signature="e#15275#16056#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Saphire.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Lib/Saphire.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="477">
-              <caret line="54" column="0" lean-forward="false" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="todo.txt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/todo.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="4" lean-forward="false" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-              <folding />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="FindInProjectRecents">
     <findStrings>
       <find>CreateTable</find>
       <find>Insert</find>
+      <find>text=</find>
+      <find>Export</find>
+      <find>InsertRow</find>
+      <find>DeleteRow</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -57,16 +58,22 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/FlameSQL.py" />
+        <option value="$PROJECT_DIR$/Lib/Saphire.py" />
+        <option value="$PROJECT_DIR$/Lib/Export.py" />
         <option value="$PROJECT_DIR$/todo.txt" />
+        <option value="$PROJECT_DIR$/Lib/TableHandle.py" />
+        <option value="$PROJECT_DIR$/Lib/About.py" />
+        <option value="$PROJECT_DIR$/Lib/NetworkFuntions.py" />
+        <option value="$PROJECT_DIR$/Lib/SqlCommandLine.py" />
+        <option value="$PROJECT_DIR$/FlameSQL.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="218" />
-    <option name="y" value="-17" />
+    <option name="x" value="614" />
+    <option name="y" value="-23" />
     <option name="width" value="960" />
-    <option name="height" value="894" />
+    <option name="height" value="728" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -105,7 +112,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -113,6 +119,11 @@
             <path>
               <item name="FlameSQL" type="b2602c69:ProjectViewProjectNode" />
               <item name="FlameSQL" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="FlameSQL" type="b2602c69:ProjectViewProjectNode" />
+              <item name="FlameSQL" type="462c0819:PsiDirectoryNode" />
+              <item name="Data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="FlameSQL" type="b2602c69:ProjectViewProjectNode" />
@@ -128,11 +139,12 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/FlameSQL.py" />
-    <property name="settings.editor.selected.configurable" value="preferences.toDoOptions" />
+    <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -146,8 +158,51 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.Unnamed">
+    <configuration name="Export" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="FlameSQL" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Lib" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Lib/Export.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="SqlCommandLine" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="FlameSQL" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Lib" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Lib/SqlCommandLine.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python">
+      <module name="FlameSQL" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -158,16 +213,26 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="FlameSQL" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FlameSQL.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
-  </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
+    <list>
+      <item itemvalue="Python.Unnamed" />
+      <item itemvalue="Python.Export" />
+      <item itemvalue="Python.SqlCommandLine" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.SqlCommandLine" />
+        <item itemvalue="Python.Export" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -192,19 +257,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14285715" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16204691" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17430703" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24538545" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32899022" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24538545" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32899022" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -217,7 +281,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="11" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -227,6 +293,264 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -235,33 +559,40 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="262">
           <caret line="85" column="0" lean-forward="false" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="128" column="16" lean-forward="false" selection-start-line="128" selection-start-column="16" selection-end-line="128" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Lib/Saphire.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="477">
-          <caret line="54" column="0" lean-forward="false" selection-start-line="54" selection-start-column="0" selection-end-line="54" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="595">
+          <caret line="35" column="41" lean-forward="true" selection-start-line="35" selection-start-column="41" selection-end-line="35" selection-end-column="41" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/todo.txt">
+    <entry file="file://$PROJECT_DIR$/Lib/Export.py" />
+    <entry file="file://$PROJECT_DIR$/todo.txt" />
+    <entry file="file://$PROJECT_DIR$/Lib/TableHandle.py" />
+    <entry file="file://$PROJECT_DIR$/OpenSource.py" />
+    <entry file="file://$PROJECT_DIR$/Lib/About.py" />
+    <entry file="file://$PROJECT_DIR$/Lib/NetworkFuntions.py" />
+    <entry file="file://$PROJECT_DIR$/Lib/SqlCommandLine.py" />
+    <entry file="file://$PROJECT_DIR$/FlameSQL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="4" lean-forward="false" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-          <folding />
+        <state relative-caret-position="17">
+          <caret line="602" column="28" lean-forward="false" selection-start-line="602" selection-start-column="28" selection-end-line="602" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#220#320#0" expanded="false" />
+            <element signature="e#343#368#0" expanded="false" />
+            <element signature="e#610#2766#0" expanded="false" />
+            <element signature="e#2791#3155#0" expanded="false" />
+            <element signature="e#3185#3710#0" expanded="false" />
+            <element signature="e#3801#6685#0" expanded="false" />
+            <element signature="e#8942#10140#0" expanded="false" />
+            <element signature="e#10163#14455#0" expanded="false" />
+            <element signature="e#14481#15252#0" expanded="false" />
+            <element signature="e#15275#16056#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
