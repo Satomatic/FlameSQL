@@ -246,6 +246,61 @@ def MainProgram(hostname, username, password):
 			insertwindow.mainloop()
 
 		def DrawTable(table):
+			def DeleteRow(selection_array):
+				if messagebox.askyesno("Sure", "Are you sure you would like to delete this data?"):
+					# Get columns
+					conn = MySQLdb.connect(hostname, username, password, database)
+					cursor = conn.cursor()
+					cursor.execute("show columns from " + table)
+					server_return = cursor.fetchall()
+
+					column_array = []
+					for item in server_return:
+						column_array.insert(len(column_array), item[0] + "::" + item[1])
+
+					sql = "delete from " + table + " where "
+
+					count = 0
+					for item in selection_array:
+						value = item
+						column = column_array[count]
+
+						print(value)
+						print(column)
+
+						datasplit = column.split("::")
+
+						print(datasplit)
+
+						if "text" in datasplit[1]:
+							char = "'"
+						else:
+							char = ""
+
+						sql = sql + datasplit[0] + "=" + char + value + char + ""
+
+						if count == len(selection_array) - 1:
+							pass
+						else:
+							sql = sql + " and "
+
+						count = count + 1
+
+					try:
+						cursor.execute(sql)
+						conn.commit()
+						TableLoad("oof")
+
+					except (MySQLdb.Error,MySQLdb.Warning) as e:
+						error = str(e).strip("(").strip(")")
+						datasplit = error.split(", ")
+						messagebox.showerror("Error",datasplit[0] + "\n" +datasplit[1])
+
+					cursor.close()
+					conn.close()
+				else:
+					pass
+
 			def GetSelectedRow(event):
 				selected = treeview.item(treeview.selection())
 				print(type(selected))
@@ -256,9 +311,8 @@ def MainProgram(hostname, username, password):
 				for item in values:
 					item = str(item)
 					selection_array.insert(len(selection_array), item)
-					print(selection_array)
 
-				#DeleteRowButton.config(state='normal', command=lambda: DeleteRow())
+				DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
 
 			column_array = []
 			
