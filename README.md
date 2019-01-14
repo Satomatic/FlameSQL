@@ -3,6 +3,8 @@
 FlameSQL is a simple MySQL server work station with an easy to use Gui written using python and the
 tk libraries.
 
+You can find the public to-do list [here](https://www.notion.so/satomatic/e85d8723b86f4e4b906ee11da2a0c1d6?v=22c93e8c2d7b4216b9a0ea3fa021410a)
+
 ## Getting Started
 
 If you are planning on downloading the source and making changed please read this.
