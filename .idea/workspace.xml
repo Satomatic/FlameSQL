@@ -13,20 +13,21 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FlameSQL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="498">
-              <caret line="302" lean-forward="true" selection-start-line="302" selection-end-line="302" />
+            <state relative-caret-position="373">
+              <caret line="624" column="37" selection-start-line="624" selection-start-column="37" selection-end-line="624" selection-end-column="37" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#220#320#0" />
                 <element signature="e#343#368#0" />
                 <element signature="e#610#2766#0" />
-                <element signature="e#2791#3155#0" />
-                <element signature="e#3185#3710#0" />
-                <element signature="e#3801#6685#0" />
-                <element signature="e#8942#10140#0" />
-                <element signature="e#10163#14455#0" />
-                <element signature="e#14481#15252#0" />
-                <element signature="e#15275#16056#0" />
+                <element signature="e#837#2743#0" />
+                <element signature="e#2796#3322#0" />
+                <element signature="e#3347#3711#0" />
+                <element signature="e#3741#4266#0" />
+                <element signature="e#4295#11221#0" />
+                <element signature="e#11247#12445#0" />
+                <element signature="e#16786#17557#0" />
+                <element signature="e#17580#18361#0" />
               </folding>
             </state>
           </provider>
@@ -49,6 +50,10 @@
       <find>Export</find>
       <find>InsertRow</find>
       <find>DeleteRow</find>
+      <find>lambda</find>
+      <find>DeleteRow(</find>
+      <find>insertrow(</find>
+      <find>CreateTab</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -64,13 +69,16 @@
         <option value="$PROJECT_DIR$/Lib/About.py" />
         <option value="$PROJECT_DIR$/Lib/NetworkFuntions.py" />
         <option value="$PROJECT_DIR$/Lib/SqlCommandLine.py" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/Lib/Feedback.py" />
+        <option value="$PROJECT_DIR$/Lib/Feedback.hidden_src" />
         <option value="$PROJECT_DIR$/FlameSQL.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="614" />
-    <option name="y" value="-23" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="602" />
+    <option name="y" value="-26" />
     <option name="width" value="960" />
     <option name="height" value="728" />
   </component>
@@ -168,6 +176,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Feedback" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="FlameSQL" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Lib" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Lib/Feedback.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="SqlCommandLine" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="FlameSQL" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -214,9 +243,11 @@
       <item itemvalue="Python.Unnamed" />
       <item itemvalue="Python.Export" />
       <item itemvalue="Python.SqlCommandLine" />
+      <item itemvalue="Python.Feedback" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Feedback" />
         <item itemvalue="Python.SqlCommandLine" />
         <item itemvalue="Python.Export" />
       </list>
@@ -247,19 +278,19 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1652452" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1684435" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.24458875" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.24458875" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Event Log" order="6" sideWeight="0.50053304" side_tool="true" weight="0.32900432" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" auto_hide="true" id="Python Console" order="8" sideWeight="0.49946696" weight="0.32792208" />
-      <window_info anchor="bottom" id="Terminal" order="9" weight="0.32899022" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.32792208" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -288,22 +319,50 @@
     <entry file="file://$PROJECT_DIR$/Lib/About.py" />
     <entry file="file://$PROJECT_DIR$/Lib/NetworkFuntions.py" />
     <entry file="file://$PROJECT_DIR$/Lib/SqlCommandLine.py" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="51">
+            <caret line="3" column="13" selection-start-line="3" selection-start-column="13" selection-end-line="3" selection-end-column="13" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Lib/Feedback.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="161" selection-start-line="22" selection-start-column="161" selection-end-line="22" selection-end-column="161" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Lib/Feedback.hidden_src">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="549">
+          <caret line="61" column="93" selection-start-line="61" selection-start-column="93" selection-end-line="61" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/FlameSQL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="498">
-          <caret line="302" lean-forward="true" selection-start-line="302" selection-end-line="302" />
+        <state relative-caret-position="373">
+          <caret line="624" column="37" selection-start-line="624" selection-start-column="37" selection-end-line="624" selection-end-column="37" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
             <element signature="e#220#320#0" />
             <element signature="e#343#368#0" />
             <element signature="e#610#2766#0" />
-            <element signature="e#2791#3155#0" />
-            <element signature="e#3185#3710#0" />
-            <element signature="e#3801#6685#0" />
-            <element signature="e#8942#10140#0" />
-            <element signature="e#10163#14455#0" />
-            <element signature="e#14481#15252#0" />
-            <element signature="e#15275#16056#0" />
+            <element signature="e#837#2743#0" />
+            <element signature="e#2796#3322#0" />
+            <element signature="e#3347#3711#0" />
+            <element signature="e#3741#4266#0" />
+            <element signature="e#4295#11221#0" />
+            <element signature="e#11247#12445#0" />
+            <element signature="e#16786#17557#0" />
+            <element signature="e#17580#18361#0" />
           </folding>
         </state>
       </provider>

@@ -92,6 +92,27 @@ def MainProgram(hostname, username, password):
 
 		ServerInfoFuntion()
 
+	def ExportServerStats():
+		exportlocation = filedialog.asksaveasfilename(title="Export stats", filetypes = (("all files", "*.*"), ("text file", "*.txt")))
+
+		if exportlocation:
+			conn = MySQLdb.connect(hostname, username, password)
+			cursor = conn.cursor()
+			rawStats = conn.stat()
+
+			datasplit = rawStats.split("  ")
+
+			exportFile = open(exportlocation, "w")
+			for item in datasplit:
+				exportFile.write(item + "\n")
+
+			exportFile.close()
+
+			messagebox.showinfo("Done", "Server stats have been exported to\n" + exportlocation)
+
+		else:
+			pass
+
 	def GetDatabases():
 		conn = MySQLdb.connect(hostname, username, password)
 		cursor = conn.cursor()
@@ -191,13 +212,19 @@ def MainProgram(hostname, username, password):
 						sql_command = sql_command + ","
 				print(sql_command)
 
-				conn = MySQLdb.connect(hostname, username, password, database)
-				cursor = conn.cursor()
-				cursor.execute(sql_command)
-				conn.commit()
-				conn.close()
+				try:
+					conn = MySQLdb.connect(hostname, username, password, database)
+					cursor = conn.cursor()
+					cursor.execute(sql_command)
+					conn.commit()
+					conn.close()
+				except (MySQLdb.Error,MySQLdb.Warning) as e:
+					error = str(e).strip("(").strip(")")
+					datasplit = error.split(", ")
+					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 
-
+				TableLoad("oof")
+				insertwindow.destroy()
 
 			Label(insertwindow, text="\nInsert row\n", font=("", 11)).pack(fill=X)
 			MainContainer = Frame(insertwindow, bd=2, relief=RIDGE)
@@ -280,17 +307,17 @@ def MainProgram(hostname, username, password):
 						sql = sql + datasplit[0] + "=" + char + value + char + ""
 
 						if count == len(selection_array) - 1:
-							pass
+							sql = sql + " limit 1" # sets limit to 1 to stop from deleting duplicate rows
 						else:
 							sql = sql + " and "
 
 						count = count + 1
 
 					try:
+						print(sql)
 						cursor.execute(sql)
 						conn.commit()
 						TableLoad("oof")
-
 					except (MySQLdb.Error,MySQLdb.Warning) as e:
 						error = str(e).strip("(").strip(")")
 						datasplit = error.split(", ")
@@ -302,17 +329,20 @@ def MainProgram(hostname, username, password):
 					pass
 
 			def GetSelectedRow(event):
-				selected = treeview.item(treeview.selection())
-				print(type(selected))
-				print(selected)
-				item = treeview.selection()[0]
-				values = treeview.item(item)['values']
-				selection_array = []
-				for item in values:
-					item = str(item)
-					selection_array.insert(len(selection_array), item)
+				try:
+					selected = treeview.item(treeview.selection())
+					print(type(selected))
+					print(selected)
+					item = treeview.selection()[0]
+					values = treeview.item(item)['values']
+					selection_array = []
+					for item in values:
+						item = str(item)
+						selection_array.insert(len(selection_array), item)
 
-				DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
+					DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
+				except:
+					pass
 
 			column_array = []
 			
@@ -368,9 +398,10 @@ def MainProgram(hostname, username, password):
 		Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow).pack(side=LEFT)
 		DeleteRowButton = Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled')
 		DeleteRowButton.pack(side=LEFT)
-		
+
+		Button(ControlPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad("oof")).pack(side=RIGHT)
+
 		#Label(TopPanel, text="Order by", font=("", 10)).place(x=250, y=0)
-		
 		
 		DrawTable(tablename)
 		
@@ -468,8 +499,8 @@ def MainProgram(hostname, username, password):
 						conn.close()
 						
 						newwindow.destroy()
-						DatabaseLoad("New table took far too long")
-						
+						DatabaseLoad("New table took far too long - Satomatic")
+
 						messagebox.showinfo("Done", "Table '" + table_name + "' has been created")
 					except (MySQLdb.Error, MySQLdb.Warning) as e:
 						error = str(e).strip("(").strip(")")
@@ -590,14 +621,21 @@ def MainProgram(hostname, username, password):
 			
 		DropTableButton.config(state='disabled')
 
+	def Feedback():
+		os.system("start Feedback.exe")
+
 	# Menu bar #
 	menubar = Menu(window)
 	menubar.add_command(label="Users")
 
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server manager", command=ServerInfo)
-	servermenu.add_command(label="Export stats")
+	servermenu.add_command(label="Export stats", command=ExportServerStats)
 	menubar.add_cascade(label="Server", menu=servermenu)
+
+	optionmenu = Menu(menubar, tearoff=0)
+	optionmenu.add_command(label="Feedback", command=Feedback)
+	menubar.add_cascade(label="Options", menu=optionmenu)
 
 	menubar.add_command(label="Logout", command=lambda: Logout(window))
 	menubar.add_command(label="Exit", command=Exit)
@@ -610,15 +648,10 @@ def MainProgram(hostname, username, password):
 	TitlePanel.pack(fill=X)
 	DBContainer = Frame(SidePanel, height=25, width=150)
 	DBContainer.pack(fill=BOTH, expand=1)
-	#DBContainerBottom = Frame(SidePanel, height=25, width=100, bd=2, relief=RIDGE)
-	#DBContainerBottom.pack(fill=X)
 	TitlePanel2 = Frame(SidePanel, height=25, width=150)
 	TitlePanel2.pack(fill=X)
 	TBContainer = Frame(SidePanel, height=25, width=150)
 	TBContainer.pack(fill=BOTH, expand=1)
-
-	#ExportButton = Button(DBContainerBottom, text="Export database", font=("", 10), width=15, height=1, bd=0, state='disabled')
-	#ExportButton.pack(side=LEFT)
 	
 	# Database list #
 	DropDatabaseButton = Button(TitlePanel, text="-", font=("", 11), width=5, height=1, bd=0, state='disabled', command=DropDatabase)
