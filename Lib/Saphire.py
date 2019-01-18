@@ -56,3 +56,44 @@ def centerwindow(win):
 def ClearPanel(panel):
     for widget in panel.winfo_children():
         widget.destroy()
+
+
+def CheckPasswordStrength(password):
+    password_value = 0
+    strength = ""
+
+    char_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    char_lower = "abdefghijklmnopqrstuvwxyz"
+    char_special = '!"£$%^&*()'
+    char_numbers = "1234567890"
+
+    if len(password) > 5:
+        password_value = password_value + 2
+
+    for letter in char_upper:
+        if letter in password:
+            password_value = password_value + 0.5
+
+    for letter in char_lower:
+        if letter in password:
+            password_value = password_value + 0.5
+
+    for letter in char_special:
+        if letter in password:
+            password_value = password_value + 3
+
+    for letter in char_numbers:
+        if letter in password:
+            password_value = password_value + 2
+
+    value_round = int(
+        password_value)
+
+    if value_round < 5:
+        strength = "weak"
+    elif value_round < 10:
+        strength = "good"
+    elif value_round > 10:
+        strength = "strong"
+
+    return strength

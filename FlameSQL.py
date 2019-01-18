@@ -526,7 +526,7 @@ def MainProgram(hostname, username, password):
 
 			# Load data types #
 			field_type_array = []
-			data_type_raw = linecache.getline("Data/SQLData.dat", 1).strip("\n")
+			data_type_raw = linecache.getline("Data/SQLData.dat", 2).strip("\n")
 			datasplit = data_type_raw.split(", ")
 			for item in datasplit:
 				field_type_array.insert(0, item)
@@ -624,9 +624,122 @@ def MainProgram(hostname, username, password):
 	def Feedback():
 		os.system("start Feedback.exe")
 
+	def UserPanel():
+		userwin = Tk()
+
+		userwin.title("FlameSQL User panel")
+		userwin.geometry("700x500")
+		userwin.resizable(0,0)
+		userwin.iconbitmap("Resources/icon.ico")
+		#userwin.attributes("-topmost", True)
+		centerwindow(userwin)
+
+		def MainPanel():
+			ClearPanel(userwin)
+			def LoadUser(event):
+				def DeleteUser(user):
+					if messagebox.askyesno("Sure", "Are you sure you would like to\ndelete the user " + user):
+						try:
+							userSplit = user.split("@")
+							userName = userSplit[0]
+							userHost = userSplit[1]
+							conn = MySQLdb.connect(hostname, username, password)
+							cursor = conn.cursor()
+							cursor.execute("DROP USER '" + userName + "'@'" + userHost + "'")
+							conn.commit()
+							cursor.close()
+							conn.close()
+
+							MainPanel()
+						except (MySQLdb.Error, MySQLdb.Warning) as e:
+							error = str(e).strip("(").strip(")")
+							datasplit = error.split(", ")
+							messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
+					else:
+						pass
+
+				selected = UserList.get(UserList.curselection())
+
+				DeleteUserButton.config(state='normal', command=lambda: DeleteUser(selected))
+
+			def NewUser():
+				ClearPanel(ContentFrame)
+
+				def KeyPress(event):
+					color = "#ffffff"
+					password = PasswordE.get()
+					password_strength = CheckPasswordStrength(password)
+
+					if password_strength == "weak":
+						color = "#d00000"
+					elif password_strength == "good":
+						color = "#ff7e00"
+					elif password_strength == "strong":
+						color = "#00b32e"
+
+					StrengthLabel.config(text=password_strength,fg=color)
+
+				# Draw new ui #
+				Label(ContentFrame, text="Create new user", font=("", 10)).place(x=10, y=10)
+
+				UsernameE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				UsernameE.place(x=10, y=50)
+
+				PasswordE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				PasswordE.place(x=10, y=80)
+				PasswordE.bind("<Key>", KeyPress)
+
+				StrengthLabel = Label(ContentFrame, font=( "", 10))
+				StrengthLabel.place(x=300, y=80)
+
+				RetypeE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				RetypeE.place(x=10, y=110)
+
+				add_placeholder_to(UsernameE, "User name", "")
+				add_placeholder_to(PasswordE, "Password", "*")
+				add_placeholder_to(RetypeE, "Confirm password", "*")
+
+			# Side controls #
+			SideContainer = Frame(userwin, bd=0, relief=RIDGE)
+			SideContainer.pack(side=LEFT, fill=Y)
+			UserList = Listbox(SideContainer, width=29, bd=2, relief=RIDGE)
+			UserList.pack(fill=Y, expand=1)
+			UserList.bind("<<ListboxSelect>>", LoadUser)
+
+			# Main content frame #
+			ContentFrame = Frame(userwin, bd=2, relief=RIDGE)
+			ContentFrame.pack(fill=BOTH, expand=1)
+
+			# Load users #
+			conn = MySQLdb.connect(hostname, username, password)
+			cursor = conn.cursor()
+			cursor.execute("select * from mysql.user")
+			server_return = cursor.fetchall()
+
+			if server_return:
+				for row in server_return:
+					host = row[0]
+					user = row[1]
+					UserList.insert(END, user + "@" + host)
+
+			cursor.close()
+			conn.close()
+
+			Footer = Frame(SideContainer, bd=2, relief=RIDGE, height=25)
+			Footer.pack(fill=X)
+
+			# Footer controls #
+			Button(Footer, text="New user", font=("", 10), width=10, bd=2, relief=RIDGE, command=NewUser).pack(side=LEFT, fill=Y)
+			DeleteUserButton = Button(Footer, text="Delete", font=("", 10), width=10, bd=2, relief=RIDGE, state='disabled')
+			DeleteUserButton.pack(side=LEFT, fill=Y)
+
+		MainPanel()
+
+		userwin.mainloop()
+
 	# Menu bar #
 	menubar = Menu(window)
-	menubar.add_command(label="Users")
+	menubar.add_command(label="Users", command=UserPanel)
 
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server manager", command=ServerInfo)
