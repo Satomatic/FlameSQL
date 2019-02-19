@@ -5,3 +5,6 @@ Lib/__pycache__/Saphire.cpython-36.pyc
 *.xml
 *.py_hidden_src
 *.pyw
+.idea/*
+.idea/workspace.xml
+.idea/workspace.xml
