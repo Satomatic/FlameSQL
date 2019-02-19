@@ -679,25 +679,115 @@ def MainProgram(hostname, username, password):
 
 					StrengthLabel.config(text=password_strength,fg=color)
 
-				# Draw new ui #
+				def CreateUser():
+					newHostname = HostnameE.get()
+					newUsername = UsernameE.get()
+					newPassword = PasswordE.get()
+					newRetype = RetypeE.get()
+
+					if (newHostname == "" or newHostname == "Hostname"):
+						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
+						pushWindow(userwin)
+					elif (newUsername == "" or newUsername == "Username"):
+						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
+						pushWindow(userwin)
+					elif (newPassword == "" or newPassword == "Password"):
+						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
+						pushWindow(userwin)
+					elif (newRetype == "" or newRetype == "Confirm password"):
+						messagebox.showerror("Error", "Please confirm the password before\ncontinuing")
+						pushWindow(userwin)
+					else:
+						if(newPassword == newRetype):
+							count = 0
+
+							conn = MySQLdb.connect(hostname, username, password)
+							cursor = conn.cursor()
+							sql = "create user '" + newUsername + "'@'" + newHostname + "' identified by '" + newPassword + "'"
+
+							cursor.execute(sql)
+							conn.commit()
+
+							sql = "grant"
+
+							for item in checkArray:
+								if count == 0:
+									sql = sql + " " + item
+									count = count + 1
+								else:
+									sql = sql + "," + item
+									count = count + 1
+
+							sql = sql + " on *.* to '" + newUsername + "'@'" + newHostname + "'"
+							cursor.execute(sql)
+							conn.commit()
+						else:
+							messagebox.showerror("Error", "Passwords do not match")
+							pushWindow(userwin)
+
+				# Login settings #
 				Label(ContentFrame, text="Create new user", font=("", 10)).place(x=10, y=10)
 
+				HostnameE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				HostnameE.place(x=10, y=50)
+
 				UsernameE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
-				UsernameE.place(x=10, y=50)
+				UsernameE.place(x=10, y=80)
 
 				PasswordE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
-				PasswordE.place(x=10, y=80)
+				PasswordE.place(x=10, y=110)
 				PasswordE.bind("<Key>", KeyPress)
 
 				StrengthLabel = Label(ContentFrame, font=( "", 10))
-				StrengthLabel.place(x=300, y=80)
+				StrengthLabel.place(x=300, y=140)
 
 				RetypeE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
-				RetypeE.place(x=10, y=110)
+				RetypeE.place(x=10, y=140)
 
-				add_placeholder_to(UsernameE, "User name", "")
+				# Limit settings #
+				Label(ContentFrame, text="Set account limits *optional", font=("", 10)).place(x=10, y=180)
+				mxQueryLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxQueryLimitE.place(x=10, y=210)
+
+				mxUpdateLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxUpdateLimitE.place(x=10, y=240)
+
+				mxConnectionLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxConnectionLimitE.place(x=10, y=270)
+
+				# Create account buttons #
+				Button(ContentFrame, text="Create account", font=("", 10), bd=2, relief=RIDGE, width=12, command=CreateUser).place(x=10, y=300)
+
+				add_placeholder_to(HostnameE, "Hostname", "")
+				add_placeholder_to(UsernameE, "Username", "")
 				add_placeholder_to(PasswordE, "Password", "*")
 				add_placeholder_to(RetypeE, "Confirm password", "*")
+
+				add_placeholder_to(mxQueryLimitE, "Max query limit", "")
+				add_placeholder_to(mxUpdateLimitE, "Max update limit", "")
+				add_placeholder_to(mxConnectionLimitE, "Max connection limit", "")
+
+				# Draw permissions #
+				permsFrame = LabelFrame(ContentFrame, text="User permissions", width=150, height=430, font=("", 10), labelanchor=N)
+				permsFrame.place(x=350, y=45)
+
+				# Draw check boxes #
+				permsCheckLine = linecache.getline("Data/SQLData.dat", 3).strip("\n")
+
+				checkArray = []
+				def CheckValue(value):
+					if value in checkArray:
+						checkArray.remove(value)
+					else:
+						checkArray.insert(0, value)
+
+				dataSplit = permsCheckLine.split(", ")
+				position = 0
+				for item in dataSplit:
+					print("Drawing " + item)
+					cb = Checkbutton(permsFrame, text=item, command=lambda x=item: CheckValue(x))
+					cb.place(x=10, y=position)
+					position = position + 20
 
 			# Side controls #
 			SideContainer = Frame(userwin, bd=0, relief=RIDGE)
@@ -816,7 +906,7 @@ def Login():
 	window.resizable(0,0)
 	window.protocol('WM_DELETE_WINDOW', Exit)
 	centerwindow(window)
-	
+
 	def LoadSaved():
 		SavedListbox.delete(0, END)
 	

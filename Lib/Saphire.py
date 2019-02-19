@@ -97,3 +97,7 @@ def CheckPasswordStrength(password):
         strength = "strong"
 
     return strength
+
+def pushWindow(window):
+    window.attributes('-topmost', 1)
+    window.attributes('-topmost', 0)
