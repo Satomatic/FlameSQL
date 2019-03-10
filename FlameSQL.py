@@ -639,6 +639,7 @@ def MainProgram(hostname, username, password):
 			def LoadUser(event):
 				def DeleteUser(user):
 					if messagebox.askyesno("Sure", "Are you sure you would like to\ndelete the user " + user):
+						pushWindow(userwin)
 						try:
 							userSplit = user.split("@")
 							userName = userSplit[0]
@@ -699,28 +700,75 @@ def MainProgram(hostname, username, password):
 						pushWindow(userwin)
 					else:
 						if(newPassword == newRetype):
-							count = 0
+							try:
+								count = 0
 
-							conn = MySQLdb.connect(hostname, username, password)
-							cursor = conn.cursor()
-							sql = "create user '" + newUsername + "'@'" + newHostname + "' identified by '" + newPassword + "'"
+								conn = MySQLdb.connect(hostname, username, password)
+								cursor = conn.cursor()
+								sql = "create user '" + newUsername + "'@'" + newHostname + "' identified by '" + newPassword + "'"
 
-							cursor.execute(sql)
-							conn.commit()
+								cursor.execute(sql)
+								conn.commit()
 
-							sql = "grant"
-
-							for item in checkArray:
-								if count == 0:
-									sql = sql + " " + item
-									count = count + 1
+								if len(checkArray) == 0:
+									pass
 								else:
-									sql = sql + "," + item
-									count = count + 1
+									sql = "grant"
+									for item in checkArray:
+										if count == 0:
+											sql = sql + " " + item
+											count = count + 1
+										else:
+											sql = sql + "," + item
+											count = count + 1
 
-							sql = sql + " on *.* to '" + newUsername + "'@'" + newHostname + "'"
-							cursor.execute(sql)
-							conn.commit()
+									sql = sql + " on *.* to '" + newUsername + "'@'" + newHostname + "'"
+									cursor.execute(sql)
+
+								QueryLimit = mxQueryLimitE.get()
+								UpdateLimit = mxUpdateLimitE.get()
+								ConnectionLimit = mxConnectionLimitE.get()
+
+								if(QueryLimit == "" or "Max query limit"):
+									pass
+								else:
+									try:
+										intv = int(QueryLimit)
+										sql = "ALTER USER '" + newUsername + "'@'" + newHostname + "' WITH MAX_QUERIES_PER_HOUR " + str(QueryLimit)
+										print(sql)
+									except:
+										messagebox.showerror("Error", "Max query limit was ignored\nbecause it is not an integer")
+										pushWindow(userwin)
+
+								if (UpdateLimit == "" or "Max update limit"):
+									pass
+								else:
+									try:
+										inv = int(UpdateLimit)
+										sql = "ALTER USER '" + newUsername + "'@'" + newHostname + "' WITH MAX_UPDATES_PER_HOUR " + str(UpdateLimit)
+										print(sql)
+									except:
+										messagebox.showerror("Error", "Max update limit was ignored\nbecause it is not an integer")
+										pushWindow(userwin)
+
+								if (ConnectionLimit == "" or "Max connection limit"):
+									pass
+								else:
+									try:
+										intv = int(ConnectionLimit)
+										sql = "ALTER USER '" + newUsername + "'@'" + newHostname + "' WITH MAX_CONNECTIONS_PER_HOUR " + str(ConnectionLimit)
+										print(sql)
+									except:
+										messagebox.showerror("Error", "Max connection limit was ignored\nbecause it is not an integer")
+										pushWindow(userwin)
+
+								messagebox.showinfo("Done", "User created '" + newUsername + "'@'" + newHostname + "'")
+
+								conn.commit()
+							except:
+								messagebox.showerror("Error", "There was an error creating the user\n'" + newUsername + "'@'" + newPassword + "'")
+
+							userwin.destroy()
 						else:
 							messagebox.showerror("Error", "Passwords do not match")
 							pushWindow(userwin)
@@ -756,7 +804,7 @@ def MainProgram(hostname, username, password):
 				mxConnectionLimitE.place(x=10, y=270)
 
 				# Create account buttons #
-				Button(ContentFrame, text="Create account", font=("", 10), bd=2, relief=RIDGE, width=12, command=CreateUser).place(x=10, y=300)
+				tkinter2.Button(ContentFrame, text="Create account", width=14, command=CreateUser).place(x=10, y=300)
 
 				add_placeholder_to(HostnameE, "Hostname", "")
 				add_placeholder_to(UsernameE, "Username", "")
@@ -819,9 +867,9 @@ def MainProgram(hostname, username, password):
 			Footer.pack(fill=X)
 
 			# Footer controls #
-			Button(Footer, text="New user", font=("", 10), width=10, bd=2, relief=RIDGE, command=NewUser).pack(side=LEFT, fill=Y)
-			DeleteUserButton = Button(Footer, text="Delete", font=("", 10), width=10, bd=2, relief=RIDGE, state='disabled')
-			DeleteUserButton.pack(side=LEFT, fill=Y)
+			tkinter2.Button(Footer, text="New user", width=13, command=NewUser).pack(side=LEFT)
+			DeleteUserButton = tkinter2.Button(Footer, text="Delete", width=13, state='disabled')
+			DeleteUserButton.pack(side=LEFT)
 
 		MainPanel()
 
@@ -1048,9 +1096,9 @@ def Login():
 		PasswordE.bind("<Return>", Connect)
 		SavedListbox.bind('<<ListboxSelect>>', OpenSave)
 		
-		Button(ConnInfoFrame, text="Connect", width=10, bd=2, relief=RIDGE, command=lambda: Connect("Reeeeee XD")).place(x=10, y=200)
-		Button(ConnInfoFrame, text="Test", width=10, bd=2, relief=RIDGE, command=TestConnection).place(x=100, y=200)
-		Button(ConnInfoFrame, text="Save", width=10, bd=2, relief=RIDGE, command=Save).place(x=190, y=200)
+		tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD")).place(x=10, y=200)
+		tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=TestConnection).place(x=100, y=200)
+		tkinter2.Button(ConnInfoFrame, text="Save", width=12, command=Save).place(x=190, y=200)
 	
 	TopPanel = PanedWindow(window, height=30, bd=2, relief=RIDGE)
 	TopPanel.pack(fill=X)
