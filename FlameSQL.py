@@ -621,9 +621,6 @@ def MainProgram(hostname, username, password):
 			
 		DropTableButton.config(state='disabled')
 
-	def Feedback():
-		os.system("start Feedback.exe")
-
 	def UserPanel():
 		userwin = Tk()
 
@@ -885,7 +882,6 @@ def MainProgram(hostname, username, password):
 	menubar.add_cascade(label="Server", menu=servermenu)
 
 	optionmenu = Menu(menubar, tearoff=0)
-	optionmenu.add_command(label="Feedback", command=Feedback)
 	menubar.add_cascade(label="Options", menu=optionmenu)
 
 	menubar.add_command(label="Logout", command=lambda: Logout(window))
