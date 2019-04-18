@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 from Lib.Saphire import *
 import linecache
+import sqlite3
 import MySQLdb
 import time
 import sys
@@ -61,7 +62,6 @@ def MainProgram(hostname, username, password):
 			conn.close()
 
 			statArray = statRaw.split("  ")
-			print(statArray)
 
 			headerPanel = PanedWindow(serverinfo, bd=2, relief=RIDGE)
 			headerPanel.pack(fill=X)
@@ -872,6 +872,72 @@ def MainProgram(hostname, username, password):
 
 		userwin.mainloop()
 
+	def ExportDatabase():
+		exportwin = Tk()
+
+		exportwin.title("FlameSQL Export database")
+		exportwin.geometry("400x430")
+		exportwin.iconbitmap("Resources/icon.ico")
+		exportwin.resizable(0,0)
+
+		selectedDatabase = ""
+
+		def ExportClose():
+			exportwin.destroy()
+
+		def ExportCommand():
+			global selectedDatabase
+			
+			exportLocation = filedialog.asksaveasfilename(filetypes=(("database file","*.db"),("all files","*.*")), title="Export database")
+
+			import Lib.Export as exportlib
+			exportlib.ExportDatabase(hostname, username, password, selectedDatabase[0], exportLocation, exportwin)
+
+		def DatabaseSelect(event):
+			global selectedDatabase
+
+			try:
+				selectedDatabase = databaseSelect.get(databaseSelect.curselection())
+			except:
+				pass
+
+			if selectedDatabase:
+				databaseLabel.config(text="Database: " + str(selectedDatabase[0]))
+			else:
+				messagebox.showerror("Error", "Please select a database")
+
+		def GetDatabases():
+			conn = MySQLdb.connect(hostname, username, password)
+			cursor = conn.cursor()
+			cursor.execute("show databases")
+			serverreturn = cursor.fetchall()
+			cursor.close()
+			conn.close()
+
+			for item in serverreturn:
+				databaseSelect.insert(END, item)
+
+		HeaderPanel = Frame(exportwin, height=80, bd=2, relief=RIDGE)
+		HeaderPanel.pack(fill=X)
+		Label(exportwin, text="Export database", font=("", 10)).place(x=10, y=10)
+
+		databaseLabel = Label(HeaderPanel, text="Database: no database selected", font=("", 10))
+		databaseLabel.place(x=10, y=50)
+
+		databaseSelect = Listbox(exportwin)
+		databaseSelect.pack(fill=BOTH, expand=1)
+		databaseSelect.bind("<<ListboxSelect>>", DatabaseSelect)
+
+		BottomPanel = Frame(exportwin, height=20, bd=2, relief=RIDGE)
+		BottomPanel.pack(fill=X)
+
+		tkinter2.Button(BottomPanel, text="export", width=15, command=ExportCommand).pack(side=LEFT)
+		tkinter2.Button(BottomPanel, text="cancel", width=15, command=ExportClose).pack(side=LEFT)
+
+		GetDatabases()
+
+		exportwin.mainloop()
+
 	# Menu bar #
 	menubar = Menu(window)
 	menubar.add_command(label="Users", command=UserPanel)
@@ -879,6 +945,7 @@ def MainProgram(hostname, username, password):
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server manager", command=ServerInfo)
 	servermenu.add_command(label="Export stats", command=ExportServerStats)
+	servermenu.add_command(label="Export database", command=ExportDatabase)
 	menubar.add_cascade(label="Server", menu=servermenu)
 
 	optionmenu = Menu(menubar, tearoff=0)
@@ -954,21 +1021,19 @@ def Login():
 	def LoadSaved():
 		SavedListbox.delete(0, END)
 	
-		if os.path.isfile("Data/Saved.dat"):
-			SaveFile = open("Data/Saved.dat")
-			
-			for line in SaveFile:
-				DataSplit = line.split("::")
-				Hostname = DataSplit[0]
-				Username = DataSplit[1]
-				Password = DataSplit[2]
-				
-				SavedListbox.insert(END, Username + "@" + Hostname)
+		database = sqlite3.connect("Data/saved.db")
+		cursor = database.cursor()
+		cursor.execute("select * from saved")
+		dbreturn = cursor.fetchall()
+		cursor.close()
+		database.close()
 
-			SaveFile.close()
-		else:
-			SaveFile = open("Data/Saved.dat", "w")
-			SaveFile.close()
+		for item in dbreturn:
+			Hostname = item[1]
+			Username = item[2]
+			Password = item[3]
+
+			SavedListbox.insert(END, Username + "@" + Hostname)
 	
 	def LoadNewGui():
 		def CheckInfo():
@@ -1035,9 +1100,13 @@ def Login():
 				username = UsernameE.get()
 				password = PasswordE.get()
 				
-				SaveFile = open("Data/Saved.dat", "a")
-				SaveFile.write(hostname + "::" + username + "::" + password + "\n")
-				SaveFile.close()
+				timestamp = int(time.time())
+				database = sqlite3.connect("Data/saved.db")
+				cursor = database.cursor()
+				cursor.execute("insert into saved(id, hostname, username, password) values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "')")
+				cursor.close()
+				database.commit()
+				database.close()
 				
 				LoadSaved()
 	
@@ -1048,28 +1117,31 @@ def Login():
 			hostname = datasplit[1]
 			username = datasplit[0]
 			
-			SaveFile = open("Data/Saved.dat")
-			for line in SaveFile:
-				if hostname + "::" + username + "::" in line:
-					datasplit = line.split("::")
-					hostname = datasplit[0].strip("\n")
-					username = datasplit[1].strip("\n")
-					password = datasplit[2].strip("\n")
-					
-					try:
-						connection = MySQLdb.connect(hostname, username, password)
-						cursor = connection.cursor()
-						cursor.close()
-						connection.close()
-						
-						window.destroy()
-						
-						MainProgram(hostname, username, password)
-					except (MySQLdb.Error, MySQLdb.Warning) as e:
-						error = str(e).strip("(").strip(")")
-						datasplit = error.split(", ")
-						messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
-			SaveFile.close()
+			database = sqlite3.connect("Data/saved.db")
+			cursor = database.cursor()
+			cursor.execute("select * from saved")
+			dbreturn = cursor.fetchall()
+			cursor.close()
+			database.close()
+			
+			for item in dbreturn:
+				hostname = item[1]
+				username = item[2]
+				password = item[3]
+
+				try:
+					connection = MySQLdb.connect(hostname, username, password)
+					cursor = connection.cursor()
+					cursor.close()
+					connection.close()
+
+					window.destroy()
+
+					MainProgram(hostname, username, password)
+				except (MySQLdb.Error, MySQLdb.Warning) as e:
+					error = str(e).strip("(").strip(")")
+					datasplit = error.split(", ")
+					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 	
 		Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
 		HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
@@ -1112,5 +1184,14 @@ def Login():
 	LoadNewGui()
 	
 	window.mainloop()
+
+if os.path.isfile("Data/saved.db"):
+	pass
+else:
+	database = sqlite3.connect("Data/saved.db")
+	cursor = database.cursor()
+	cursor.execute("create table saved(id INTEGER, hostname TEXT, username TEXT, password TEXT)")
+	cursor.close()
+	database.commit()
 
 Login()
