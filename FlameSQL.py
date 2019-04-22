@@ -166,7 +166,7 @@ def MainProgram(hostname, username, password):
 			def RowSubmit():
 				item_array = []
 				count = 0
-				for item in MainContainer.winfo_children():
+				for item in itemFrame.winfo_children():
 					item_name = str(item)
 					if "label" in item_name:
 						pass
@@ -237,7 +237,6 @@ def MainProgram(hostname, username, password):
 			cursor = conn.cursor()
 			cursor.execute("show columns from " + tablename)
 			server_return = cursor.fetchall()
-			print(server_return)
 
 			row_array = []
 
@@ -250,25 +249,38 @@ def MainProgram(hostname, username, password):
 			cursor.close()
 			conn.close()
 
+			# I hate scrolling frames in tkinter :/ #
+			scrollArea = Canvas(MainContainer, bd=0)
+			scrollArea.grid(column=0, row=0, sticky=N+S+E+W)
+
+			scrollBar = Scrollbar(MainContainer)
+			scrollBar.grid(column=1, row=0, sticky=N+S)
+
+			scrollArea.config(yscrollcommand=scrollBar.set)
+			scrollBar.config(command=scrollArea.yview)
+
+			itemFrame = Frame(scrollArea, bd=0)
+
 			# Draw stuff
-			init_pos_y = 10
-			add_value = 30
+			init_pos_y = 0
+			add_value = 1
 
 			for item in row_array:
 				init_pos_y = init_pos_y + add_value
-				Label(MainContainer, text=item, font=("", 11)).place(x=10, y=init_pos_y)
+				Label(itemFrame, text=item, font=("", 11), justify=LEFT).grid(row=init_pos_y, column=0, sticky=W)
 
-				data_entry = Entry(MainContainer, font=("", 10), bd=2, relief=RIDGE, width=30)
-				data_entry.place(x=90, y=init_pos_y)
+				data_entry = Entry(itemFrame, font=("", 10), bd=2, relief=RIDGE, width=30)
+				data_entry.grid(row=init_pos_y, column=1)
 
-			for widget in MainContainer.winfo_children():
-				print(str(widget))
+			scrollArea.create_window((0,0), anchor=NW, window=itemFrame)
+			itemFrame.update_idletasks()
+			scrollArea.config(scrollregion= itemFrame.bbox("all"))
 
 			FooterPanel = Frame(insertwindow, height=30)
 			FooterPanel.pack(fill=X)
 
-			Button(FooterPanel, text="Submit", bd=2, relief=RIDGE, width=10, command=RowSubmit).place(x=1, y=1)
-			Button(FooterPanel, text="close", bd=2, relief=RIDGE, width=10, command=insertwindow.destroy).place(x=90, y=1)
+			tkinter2.Button(FooterPanel, text="Submit", width=10).place(x=2, y=2)
+			tkinter2.Button(FooterPanel, text="Close", width=10).place(x=80, y=2)
 
 			insertwindow.mainloop()
 
@@ -328,6 +340,148 @@ def MainProgram(hostname, username, password):
 				else:
 					pass
 
+			def EditRow(selection_array):
+				editwin = Tk()
+
+				editwin.title("FlameSQL Edit row")
+				editwin.geometry("400x430")
+				editwin.resizable(0,0)
+				editwin.iconbitmap("Resources/icon.ico")
+
+				def editCommand():
+					sql = "UPDATE " + tablename + " SET "
+
+					item_data_array = []
+					for item in objectArea.winfo_children():
+						item_name = str(item)
+
+						if "label" in item_name:
+							pass
+						else:
+							item_input = item.get()
+							
+							item_data_array.insert(len(item_data_array), item_input)
+
+					count = 0
+					for item in selection_array:
+						if "text" in col_type_array[count]:
+							syn = "'"
+						else:
+							syn = ""
+
+						sql = sql + col_name_array[count] + "=" + syn + item_data_array[count] + syn + ","
+
+						count = count + 1
+
+					sql = sql[:-1] + " WHERE "
+
+					count = 0
+					for item in selection_array:
+						col = col_name_array[count]
+						val = col_data_array[count]
+						fom = col_type_array[count]
+
+						if "text" in fom:
+							syn = "'"
+						else:
+							syn = ""
+
+						sql = sql + col + "=" + syn + val + syn + " AND "
+
+						count = count + 1
+
+					sql = sql[:-5]
+
+					print(sql)
+
+					try:
+						conn = MySQLdb.connect(hostname, username, password, database)
+						cursor = conn.cursor()
+						cursor.execute(sql)
+						cursor.close()
+						conn.commit()
+						conn.close()
+
+						messagebox.showinfo("Done", "Data has been updated")
+
+						TableLoad("Oof")
+
+						editwin.destroy()
+
+					except Exception as e:
+						messagebox.showerror("Error", str(e))
+						
+						raiseFrame(editwin)
+
+				def cancel():
+					editwin.destroy()
+
+				headerPanel = Frame(editwin, height=50, bd=2, relief=RIDGE)
+				headerPanel.pack(fill=X)
+				Label(headerPanel, text="\nEdit data\n", font=("", 11)).pack(fill=X)
+
+				mainContainer = Frame(editwin, bd=2, relief=RIDGE)
+				mainContainer.pack(fill=BOTH, expand=1)
+
+				scrollArea = Canvas(mainContainer)
+				scrollArea.grid(column=0, row=0, sticky=N+S+E+W)
+
+				scrollBar = Scrollbar(mainContainer)
+				scrollBar.grid(column=1, row=0, sticky=N+S)
+				scrollArea.config(yscrollcommand=scrollBar.set)
+				scrollBar.config(command=scrollArea.yview)
+
+				objectArea = Frame(scrollArea)
+				
+				# I still hate scrolling frames in tkinter :/ #
+				conn = MySQLdb.connect(hostname, username, password, database)
+				cursor = conn.cursor()
+				cursor.execute("show columns from " + tablename)
+				serverreturn = cursor.fetchall()
+				cursor.close()
+				conn.close()
+
+				print(serverreturn)
+
+				count = 0
+				pos_y = 0
+				col_type_array = []
+				col_name_array = []
+				col_data_array = []
+				for item in serverreturn:
+					col_name = item[0]
+					col_type = item[1]
+					col_data = selection_array[count]
+
+
+					col_type_array.insert(len(col_type_array), col_type)
+					col_name_array.insert(len(col_name_array), col_name)
+					col_data_array.insert(len(col_data_array), col_data)
+
+					pos_y = pos_y + 1
+
+					Label(objectArea, text=col_name, font=("", 11), justify=LEFT).grid(row=pos_y, column=0, sticky=W)
+
+					data_entry = Entry(objectArea, font=("", 10), bd=2, relief=RIDGE, width=30)
+					data_entry.grid(row=pos_y, column=1)
+
+					add_placeholder_to(data_entry, col_data, "")
+
+					count = count + 1
+
+				scrollArea.create_window((0,0), anchor=NW, window=objectArea)
+				objectArea.update_idletasks()
+				scrollArea.config(scrollregion=objectArea.bbox("all"))
+
+				FooterPanel = Frame(editwin, height=40, bd=2, relief=RIDGE)
+				FooterPanel.pack(fill=X)
+
+				tkinter2.Button(FooterPanel, text="Save", width=14, command=editCommand).pack(side=LEFT)
+				tkinter2.Button(FooterPanel, text="Cancel", width=14, command=cancel).pack(side=LEFT)
+
+				editwin.mainloop()
+
+
 			def GetSelectedRow(event):
 				try:
 					selected = treeview.item(treeview.selection())
@@ -341,6 +495,7 @@ def MainProgram(hostname, username, password):
 						selection_array.insert(len(selection_array), item)
 
 					DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
+					EditRowButton.config(state='normal', command=lambda: EditRow(selection_array))
 				except:
 					pass
 
@@ -396,8 +551,12 @@ def MainProgram(hostname, username, password):
 		ControlPanel.pack(fill=X)
 		
 		Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow).pack(side=LEFT)
+
 		DeleteRowButton = Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled')
 		DeleteRowButton.pack(side=LEFT)
+
+		EditRowButton = Button(ControlPanel, text="Edit row", width=10, bd=0, state='disabled')
+		EditRowButton.pack(side=LEFT)
 
 		Button(ControlPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad("oof")).pack(side=RIGHT)
 
@@ -441,7 +600,7 @@ def MainProgram(hostname, username, password):
 		DatabaseE = Entry(newwindow, width=30, bd=2, relief=RIDGE)
 		DatabaseE.place(x=10, y=40)
 		
-		Button(newwindow, text="Create", bd=2, relief=RIDGE, width=10, command=DatabaseCreate).place(x=10, y=70)
+		tkinter2.Button(newwindow, text="Create", width=10, command=DatabaseCreate).place(x=10, y=70)
 		
 		add_placeholder_to(DatabaseE, "Database name", "")
 		
@@ -475,8 +634,10 @@ def MainProgram(hostname, username, password):
 				
 				if table_name == "Table name" or table_name == " ":
 					messagebox.showerror("Error", "Please enter table name")
+					raiseFrame(newwindow)
 				elif field_count == 0:
 					messagebox.showerror("Error", "Table must have at least 1 field")
+					raiseFrame(newwindow)
 				else:
 					count = 0
 					for item in field_array:
@@ -506,8 +667,8 @@ def MainProgram(hostname, username, password):
 						error = str(e).strip("(").strip(")")
 						datasplit = error.split(", ")
 						messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
-						newwindow.attributes("-topmost", 1) # Brings window back to front
-						newwindow.attributes("-topmost", 0)
+						
+						raiseFrame(newwindow)
 			
 			def InsertField():
 				fieldname = FieldNameE.get()
@@ -538,11 +699,11 @@ def MainProgram(hostname, username, password):
 			
 			Label(InfoPanel, text="Create table", font=("", 10)).place(x=10, y=10)
 			
-			TableNameE = Entry(InfoPanel, width=30, bd=2, relief=RIDGE)
+			TableNameE = Entry(InfoPanel, width=30, bd=2, relief=GROOVE)
 			TableNameE.place(x=10, y=40)
 			
 			Label(InfoPanel, text="Field name", font=("", 10)).place(x=10, y=100)
-			FieldNameE = Entry(InfoPanel, width=20, bd=2, relief=RIDGE)
+			FieldNameE = Entry(InfoPanel, width=20, bd=2, relief=GROOVE)
 			FieldNameE.place(x=10, y=120)
 			Label(InfoPanel, text="Field type", font=("", 10)).place(x=160, y=100)
 			
@@ -550,7 +711,7 @@ def MainProgram(hostname, username, password):
 			FieldTypeE.current(0)
 			FieldTypeE.place(x=160, y=120)
 			
-			Button(InfoPanel, text="Insert", bd=2, relief=RIDGE, width=10, command=InsertField).place(x=305, y=117)
+			Button(InfoPanel, text="Insert", width=10, height=1, bd=2, relief=GROOVE, font=("", 8), command=InsertField).place(x=308, y=118)
 			
 			add_placeholder_to(TableNameE, "Table name", "")
 			add_placeholder_to(FieldNameE, "Field name", "")
@@ -569,8 +730,8 @@ def MainProgram(hostname, username, password):
 			BottomPanel = Frame(newwindow, height=30)
 			BottomPanel.pack(fill=X, expand=1)
 			
-			Button(BottomPanel, text="ok", bd=2, relief=RIDGE, width=10, command=CreateTable).place(x=1, y=1)
-			Button(BottomPanel, text="close", bd=2, relief=RIDGE, width=10, command=newwindow.destroy).place(x=90, y=1)
+			Button(BottomPanel, text="ok", bd=2, relief=GROOVE, width=10, command=CreateTable).place(x=5, y=3)
+			Button(BottomPanel, text="close", bd=2, relief=GROOVE, width=10, command=newwindow.destroy).place(x=94, y=3)
 			
 			newwindow.mainloop()
 	

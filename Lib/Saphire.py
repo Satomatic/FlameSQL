@@ -101,3 +101,7 @@ def CheckPasswordStrength(password):
 def pushWindow(window):
     window.attributes('-topmost', 1)
     window.attributes('-topmost', 0)
+
+def raiseFrame(window):
+    window.attributes("-topmost", True)
+    window.attributes("-topmost", False)
