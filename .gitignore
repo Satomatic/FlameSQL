@@ -9,3 +9,4 @@ Lib/__pycache__/Saphire.cpython-36.pyc
 .idea/workspace.xml
 .idea/workspace.xml
 run.bat
+*.db

@@ -98,10 +98,32 @@ def CheckPasswordStrength(password):
 
     return strength
 
-def pushWindow(window):
-    window.attributes('-topmost', 1)
-    window.attributes('-topmost', 0)
-
 def raiseFrame(window):
     window.attributes("-topmost", True)
     window.attributes("-topmost", False)
+
+def limitText(limit, text):
+    text_length = len(text)
+    text_sub = text_length - limit
+
+    newText = text[:-text_sub]
+    newText = newText + "..."
+
+    return newText
+
+def extendText(extendto, text):
+    text_length = len(text)
+    text_addition = extendto - text_length
+
+    newText = text
+    while True:
+        text_length = text_length + 1
+
+        newText = newText + " "
+
+        if text_length == extendto:
+            break
+        else:
+            continue
+
+    return newText

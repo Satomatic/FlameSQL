@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.ttk as tkinter2
 from tkinter import messagebox
 from tkinter import filedialog
-from Lib.Saphire import *
+from Lib.Sapphire import *
 import linecache
 import sqlite3
 import MySQLdb
@@ -250,7 +250,7 @@ def MainProgram(hostname, username, password):
 			conn.close()
 
 			# I hate scrolling frames in tkinter :/ #
-			scrollArea = Canvas(MainContainer, bd=0)
+			scrollArea = Canvas(MainContainer, highlightthickness=0)
 			scrollArea.grid(column=0, row=0, sticky=N+S+E+W)
 
 			scrollBar = Scrollbar(MainContainer)
@@ -279,8 +279,8 @@ def MainProgram(hostname, username, password):
 			FooterPanel = Frame(insertwindow, height=30)
 			FooterPanel.pack(fill=X)
 
-			tkinter2.Button(FooterPanel, text="Submit", width=10).place(x=2, y=2)
-			tkinter2.Button(FooterPanel, text="Close", width=10).place(x=80, y=2)
+			tkinter2.Button(FooterPanel, text="Submit", width=10, command=RowSubmit).place(x=2, y=2)
+			tkinter2.Button(FooterPanel, text="Close", width=10, command=insertwindow.destroy).place(x=80, y=2)
 
 			insertwindow.mainloop()
 
@@ -423,7 +423,7 @@ def MainProgram(hostname, username, password):
 				mainContainer = Frame(editwin, bd=2, relief=RIDGE)
 				mainContainer.pack(fill=BOTH, expand=1)
 
-				scrollArea = Canvas(mainContainer)
+				scrollArea = Canvas(mainContainer, highlightthickness=0)
 				scrollArea.grid(column=0, row=0, sticky=N+S+E+W)
 
 				scrollBar = Scrollbar(mainContainer)
@@ -460,7 +460,12 @@ def MainProgram(hostname, username, password):
 
 					pos_y = pos_y + 1
 
-					Label(objectArea, text=col_name, font=("", 11), justify=LEFT).grid(row=pos_y, column=0, sticky=W)
+					if len(col_name) > 10:
+						labelText = limitText(10, col_name)
+					else:
+						labelText = extendText(20, col_name)
+
+					Label(objectArea, text=labelText, font=("", 11), justify=LEFT).grid(row=pos_y, column=0, sticky=W)
 
 					data_entry = Entry(objectArea, font=("", 10), bd=2, relief=RIDGE, width=30)
 					data_entry.grid(row=pos_y, column=1)
