@@ -1,8 +1,8 @@
-from tkinter import *
 import tkinter.ttk as tkinter2
 from tkinter import messagebox
 from tkinter import filedialog
 from Lib.Sapphire import *
+from tkinter import *
 import linecache
 import sqlite3
 import MySQLdb
@@ -794,7 +794,6 @@ def MainProgram(hostname, username, password):
 		userwin.geometry("700x500")
 		userwin.resizable(0,0)
 		userwin.iconbitmap("Resources/icon.ico")
-		#userwin.attributes("-topmost", True)
 		centerwindow(userwin)
 
 		def MainPanel():
@@ -802,7 +801,7 @@ def MainProgram(hostname, username, password):
 			def LoadUser(event):
 				def DeleteUser(user):
 					if messagebox.askyesno("Sure", "Are you sure you would like to\ndelete the user " + user):
-						pushWindow(userwin)
+						raiseFrame(userwin)
 						try:
 							userSplit = user.split("@")
 							userName = userSplit[0]
@@ -851,16 +850,16 @@ def MainProgram(hostname, username, password):
 
 					if (newHostname == "" or newHostname == "Hostname"):
 						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
-						pushWindow(userwin)
+						raiseFrame(userwin)
 					elif (newUsername == "" or newUsername == "Username"):
 						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
-						pushWindow(userwin)
+						raiseFrame(userwin)
 					elif (newPassword == "" or newPassword == "Password"):
 						messagebox.showerror("Error", "You must include a\nHostname\nUsername\nand Password")
-						pushWindow(userwin)
+						raiseFrame(userwin)
 					elif (newRetype == "" or newRetype == "Confirm password"):
 						messagebox.showerror("Error", "Please confirm the password before\ncontinuing")
-						pushWindow(userwin)
+						raiseFrame(userwin)
 					else:
 						if(newPassword == newRetype):
 							try:
@@ -901,7 +900,7 @@ def MainProgram(hostname, username, password):
 										print(sql)
 									except:
 										messagebox.showerror("Error", "Max query limit was ignored\nbecause it is not an integer")
-										pushWindow(userwin)
+										raiseFrame(userwin)
 
 								if (UpdateLimit == "" or "Max update limit"):
 									pass
@@ -912,7 +911,7 @@ def MainProgram(hostname, username, password):
 										print(sql)
 									except:
 										messagebox.showerror("Error", "Max update limit was ignored\nbecause it is not an integer")
-										pushWindow(userwin)
+										raiseFrame(userwin)
 
 								if (ConnectionLimit == "" or "Max connection limit"):
 									pass
@@ -923,7 +922,7 @@ def MainProgram(hostname, username, password):
 										print(sql)
 									except:
 										messagebox.showerror("Error", "Max connection limit was ignored\nbecause it is not an integer")
-										pushWindow(userwin)
+										raiseFrame(userwin)
 
 								messagebox.showinfo("Done", "User created '" + newUsername + "'@'" + newHostname + "'")
 
@@ -934,36 +933,36 @@ def MainProgram(hostname, username, password):
 							userwin.destroy()
 						else:
 							messagebox.showerror("Error", "Passwords do not match")
-							pushWindow(userwin)
+							raiseFrame(userwin)
 
 				# Login settings #
 				Label(ContentFrame, text="Create new user", font=("", 10)).place(x=10, y=10)
 
-				HostnameE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				HostnameE = Entry(ContentFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
 				HostnameE.place(x=10, y=50)
 
-				UsernameE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				UsernameE = Entry(ContentFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
 				UsernameE.place(x=10, y=80)
 
-				PasswordE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				PasswordE = Entry(ContentFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
 				PasswordE.place(x=10, y=110)
 				PasswordE.bind("<Key>", KeyPress)
 
 				StrengthLabel = Label(ContentFrame, font=( "", 10))
 				StrengthLabel.place(x=300, y=140)
 
-				RetypeE = Entry(ContentFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+				RetypeE = Entry(ContentFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
 				RetypeE.place(x=10, y=140)
 
 				# Limit settings #
 				Label(ContentFrame, text="Set account limits *optional", font=("", 10)).place(x=10, y=180)
-				mxQueryLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxQueryLimitE = Entry(ContentFrame, width=30, bd=2, relief=GROOVE, font=("", 10))
 				mxQueryLimitE.place(x=10, y=210)
 
-				mxUpdateLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxUpdateLimitE = Entry(ContentFrame, width=30, bd=2, relief=GROOVE, font=("", 10))
 				mxUpdateLimitE.place(x=10, y=240)
 
-				mxConnectionLimitE = Entry(ContentFrame, width=30, bd=2, relief=RIDGE, font=("", 10))
+				mxConnectionLimitE = Entry(ContentFrame, width=30, bd=2, relief=GROOVE, font=("", 10))
 				mxConnectionLimitE.place(x=10, y=270)
 
 				# Create account buttons #
@@ -1111,6 +1110,7 @@ def MainProgram(hostname, username, password):
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server manager", command=ServerInfo)
 	servermenu.add_command(label="Export stats", command=ExportServerStats)
+	servermenu.add_separator()
 	servermenu.add_command(label="Export database", command=ExportDatabase)
 	menubar.add_cascade(label="Server", menu=servermenu)
 
@@ -1202,6 +1202,10 @@ def Login():
 			SavedListbox.insert(END, Username + "@" + Hostname)
 	
 	def LoadNewGui():
+		global HostnameE
+		global UsernameE
+		global PasswordE
+
 		def CheckInfo():
 			hostname = HostnameE.get()
 			username = UsernameE.get()
@@ -1221,7 +1225,7 @@ def Login():
 				
 			return returnstring
 	
-		def Connect(event):
+		def Connect(event, HostnameE, UsernameE, PasswordE):
 			hostname = HostnameE.get()
 			username = UsernameE.get()
 			password = PasswordE.get()
@@ -1240,7 +1244,7 @@ def Login():
 				datasplit = error.split(", ")
 				messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 		
-		def TestConnection():
+		def TestConnection(HostnameE, UsernameE, PasswordE):
 			hostname = HostnameE.get()
 			username = UsernameE.get()
 			password = PasswordE.get()
@@ -1276,7 +1280,7 @@ def Login():
 				
 				LoadSaved()
 	
-		def OpenSave(event):
+		'''def OpenSave(event):
 			selected = SavedListbox.get(SavedListbox.curselection())
 			
 			datasplit = selected.split("@")
@@ -1307,8 +1311,95 @@ def Login():
 				except (MySQLdb.Error, MySQLdb.Warning) as e:
 					error = str(e).strip("(").strip(")")
 					datasplit = error.split(", ")
-					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
-	
+					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])'''
+
+		def OpenSave(event):
+			selected = SavedListbox.get(SavedListbox.curselection())
+
+			ClearPanel(ConnInfoFrame)
+
+			def UpdateSave():
+				hostname = HostnameE.get()
+				username = UsernameE.get()
+				password = PasswordE.get()
+
+				timestamp = int(time.time())
+
+				try:
+					sql = "delete from saved where hostname='" + hostname + "' and username='" + username + "'"
+					print(sql)
+					sql2 = "insert into saved(id, hostname, username, password) values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "')"
+					database = sqlite3.connect("Data/saved.db")
+					cursor = database.cursor()
+					cursor.execute(sql)
+					database.commit()
+					cursor.execute(sql2)
+					database.commit()
+					cursor.close()
+					database.close()
+					
+					messagebox.showinfo("Done", "Server information has been updated.")
+					LoadSaved()
+				except Exception as e:
+					messagebox.showerror("Error", str(e))
+
+			def DeleteSave():
+				hostname = HostnameE.get()
+				username = UsernameE.get()
+				password = PasswordE.get()
+
+				try:
+					sql = "delete from saved where hostname='" + hostname + "' and username='" + username + "' and password='" + password + "'"
+					database = sqlite3.connect("Data/saved.db")
+					cursor = database.cursor()
+					cursor.execute(sql)
+					cursor.close()
+					database.commit()
+					database.close()
+
+					LoadSaved()
+				except Exception as e:
+					messagebox.showerror("Error", str(e))
+
+			datasplit = selected.split("@")
+			username = datasplit[0]
+			serverip = datasplit[1]
+
+			database = sqlite3.connect("Data/saved.db")
+			cursor = database.cursor()
+			cursor.execute("select * from saved where hostname='" + serverip + "' and username='" + username + "'")
+			dbreturn = cursor.fetchall()
+			cursor.close()
+			database.close()
+
+			for item in dbreturn:
+				password = item[3]
+
+			Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
+			HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+			HostnameE.place(x=100, y=10)
+			
+			Label(ConnInfoFrame, text="Username", font=("", 11)).place(x=10, y=60)
+			UsernameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+			UsernameE.place(x=100, y=60)
+			
+			Label(ConnInfoFrame, text="Password", font=("", 11)).place(x=10, y=110)
+			PasswordE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10), show="*")
+			PasswordE.place(x=100, y=110)
+
+			HostnameE.insert(END, serverip)
+			UsernameE.insert(END, username)
+			PasswordE.insert(END, password)
+
+			tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
+			tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
+			tkinter2.Button(ConnInfoFrame, text="Update", width=12, command=UpdateSave).place(x=190, y=200)
+			tkinter2.Button(ConnInfoFrame, text="Delete", width=12, command=DeleteSave).place(x=280, y=200)
+
+		global HostnameE
+		global UsernameE
+		global PasswordE
+
 		Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
 		HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
 		HostnameE.place(x=100, y=10)
@@ -1330,8 +1421,8 @@ def Login():
 		PasswordE.bind("<Return>", Connect)
 		SavedListbox.bind('<<ListboxSelect>>', OpenSave)
 		
-		tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD")).place(x=10, y=200)
-		tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=TestConnection).place(x=100, y=200)
+		tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
+		tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
 		tkinter2.Button(ConnInfoFrame, text="Save", width=12, command=Save).place(x=190, y=200)
 	
 	TopPanel = PanedWindow(window, height=30, bd=2, relief=RIDGE)
