@@ -41,13 +41,9 @@ def ExportDatabase(hostname, username, password, databasename, location, window)
 				else:
 					sql = sql + column[0] + " " + column[1] + ", "
 					sql2 = sql2 + column[0] + ", "
-			
-			sql = sql + ")"
-			sql2 = sql2 + ") values ("
 
-			print(objectArray)
-
-			print(sql2)
+			sql += ")"
+			sql2 += ") values ("
 
 			dbcursor.execute(sql)
 
