@@ -1197,7 +1197,7 @@ def Login():
 	window.geometry("600x500")
 	window.iconbitmap("Resources/icon.ico")
 	window.resizable(0,0)
-	window.protocol('WM_DELETE_WINDOW', Exit)
+	#window.protocol('WM_DELETE_WINDOW', lambda: Exit("", "", ""))
 	centerwindow(window)
 
 	def LoadSaved():
@@ -1437,8 +1437,27 @@ if os.path.isfile("Data/saved.db"):
 			username = item[2]
 			password = item[3]
 
-			MainProgram(hostname, username, password)
+			# test connection #
+			try:
+				conn = MySQLdb.connect(hostname, username, password)
+				conn.close()
+
+				database.close()
+
+				MainProgram(hostname, username, password)
+
+			except Exception as e:
+
+				window = Tk()
+				messagebox.showerror("Error", "Failed to open previous session\n" + str(e))
+				window.destroy()
+
+				cursor.execute("delete from session where id=1")
+				database.commit()
+				database.close()
+				Login()
 	else:
+		database.close()
 		Login()
 
 else:
