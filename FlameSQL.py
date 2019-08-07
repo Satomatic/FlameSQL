@@ -1,12 +1,15 @@
 import tkinter.ttk as tkinter2
 from tkinter import messagebox
 from tkinter import filedialog
-from Lib.Sapphire import *
+from PIL import Image, ImageTk
+from Lib.gl import *
+from Lib.Widgets import *
 from tkinter import *
 import linecache
 import sqlite3
 import MySQLdb
 import time
+import PIL
 import sys
 import os
 
@@ -35,6 +38,10 @@ def Logout(window):
 	window.destroy()
 	Login()
 
+for item in os.listdir("Modules"):
+	exec("import Modules." + item.strip(".py") + " as " + item.strip(".py"))
+	print("import Modules." + item.strip(".py") + " as " + item.strip(".py"))
+
 def MainProgram(hostname, username, password):
 	window = Tk()
 
@@ -42,6 +49,16 @@ def MainProgram(hostname, username, password):
 	window.geometry("1280x720")
 	window.iconbitmap("Resources/icon.ico")
 	window.protocol('WM_DELETE_WINDOW', lambda: Exit(hostname, username, password))
+	
+	# global variables #
+	global ctable
+	global cdatabase
+	
+	ctable = ""
+	cdatabase = ""
+	
+	database_icon = ImageTk.PhotoImage(PIL.Image.open("Resources/icons/database.png").convert("RGBA"))
+	table_icon = ImageTk.PhotoImage(PIL.Image.open("Resources/icons/table.png").convert("RGBA"))
 
 	def ServerInfo():
 		serverinfo = Tk()
@@ -126,23 +143,6 @@ def MainProgram(hostname, username, password):
 		else:
 			pass
 
-	def GetDatabases():
-		conn = MySQLdb.connect(hostname, username, password)
-		cursor = conn.cursor()
-		cursor.execute("show databases")
-		server_return = cursor.fetchall()
-
-		DatabaseListbox.delete(0, END)
-
-		if server_return:
-			for row in server_return:
-				DatabaseListbox.insert(END, row)
-		else:
-			DatabaseListbox.insert(END, "No databases")
-
-		cursor.close()
-		conn.close()
-
 	def DatabaseLoad(event):
 		select = DatabaseListbox.get(DatabaseListbox.curselection())
 		selected = str(select[0])
@@ -165,8 +165,8 @@ def MainProgram(hostname, username, password):
 		else:
 			TableListbox.insert(END, "No tables found")
 
-	def TableLoad(event):
-		DropTableButton.config(state='normal')
+	def TableLoad(tablename, database):
+		#DropTableButton.config(state='normal')
 
 		def InsertRow():
 			insertwindow = Tk()
@@ -232,17 +232,14 @@ def MainProgram(hostname, username, password):
 					datasplit = error.split(", ")
 					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 
-				TableLoad("oof")
+				TableLoad(tablename, cdatabase)
 				insertwindow.destroy()
 
 			Label(insertwindow, text="\nInsert row\n", font=("", 11)).pack(fill=X)
 			MainContainer = Frame(insertwindow, bd=2, relief=RIDGE)
 			MainContainer.pack(fill=BOTH, expand=1)
 
-			# Get column information
-			global database
-
-			conn = MySQLdb.connect(hostname, username, password, database)
+			conn = MySQLdb.connect(hostname, username, password, cdatabase)
 			cursor = conn.cursor()
 			cursor.execute("show columns from " + tablename)
 			server_return = cursor.fetchall()
@@ -333,7 +330,7 @@ def MainProgram(hostname, username, password):
 						print(sql)
 						cursor.execute(sql)
 						conn.commit()
-						TableLoad("oof")
+						TableLoad(tablename, cdatabase)
 					except (MySQLdb.Error,MySQLdb.Warning) as e:
 						error = str(e).strip("(").strip(")")
 						datasplit = error.split(", ")
@@ -405,10 +402,10 @@ def MainProgram(hostname, username, password):
 						cursor.close()
 						conn.commit()
 						conn.close()
+	
+						
 
-						messagebox.showinfo("Done", "Data has been updated")
-
-						TableLoad("Oof")
+						TableLoad(tablename, database)
 
 						editwin.destroy()
 
@@ -503,6 +500,8 @@ def MainProgram(hostname, username, password):
 
 					DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
 					EditRowButton.config(state='normal', command=lambda: EditRow(selection_array))
+					
+					return selection_array
 				except:
 					pass
 
@@ -540,18 +539,12 @@ def MainProgram(hostname, username, password):
 			treeview = tv
 			treeview.pack(fill=BOTH, expand=1)
 
-			# Insert data to table #
 			for row in table_raw:
 				treeview.insert('', 'end', values=row)
 
 			treeview.bind("<ButtonRelease-1>", GetSelectedRow)
 
 		ClearPanel(MainWorkspace)
-		if "load_table::" in str(event):
-			tablename = event.strip("load_table::")
-		else:
-			tablename = TableListbox.get(TableListbox.curselection())
-
 
 		# Top Panel #
 		TopPanel = Frame(MainWorkspace, height=25, bd=2, relief=GROOVE)
@@ -570,13 +563,13 @@ def MainProgram(hostname, username, password):
 		EditRowButton = Button(ControlPanel, text="Edit row", width=10, bd=0, state='disabled')
 		EditRowButton.pack(side=LEFT)
 
-		Button(ControlPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad("oof")).pack(side=RIGHT)
-
-		#Label(TopPanel, text="Order by", font=("", 10)).place(x=250, y=0)
+		Button(ControlPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad(tablename, cdatabase)).pack(side=RIGHT)
 
 		DrawTable(tablename)
 
-	def NewDatabase():
+	def NewDatabase(event):
+		print(cdatabase)
+	
 		newwindow = Tk()
 
 		newwindow.title("FlameSQL New Database")
@@ -606,7 +599,7 @@ def MainProgram(hostname, username, password):
 			cursor.close()
 			conn.close()
 
-			GetDatabases()
+			treeview.insert("", END, text=databasename, image=database_icon, tags=("database"))
 
 		Label(newwindow, text="New database", font=("", 10)).place(x=10, y=10)
 		DatabaseE = Entry(newwindow, width=30, bd=2, relief=RIDGE)
@@ -618,13 +611,14 @@ def MainProgram(hostname, username, password):
 
 		newwindow.mainloop()
 
-	def NewTable():
-		try:
-			database = DatabaseListbox.get(DatabaseListbox.curselection())
-			database_select = True
-		except:
+	def NewTable(event):
+		if cdatabase == "":
 			messagebox.showerror("Error", "Please select a database")
 			database_select = False
+		else:
+			database_select = True
+		
+		database = cdatabase
 
 		if database_select == True:
 			newwindow = Tk()
@@ -660,9 +654,9 @@ def MainProgram(hostname, username, password):
 							field_string = field_string + item + ","
 
 					sql_string = "create table " + table_name + " (" + field_string + ")"
-					print(sql_string)
+
 					try:
-						conn = MySQLdb.connect(hostname, username, password, str(database[0]))
+						conn = MySQLdb.connect(hostname, username, password, str(database))
 						cursor = conn.cursor()
 
 						cursor.execute(sql_string)
@@ -672,8 +666,19 @@ def MainProgram(hostname, username, password):
 						conn.close()
 
 						newwindow.destroy()
-						DatabaseLoad("New table took far too long - Satomatic")
-
+						
+						selected = treeview.item(treeview.selection())
+						
+						tags = selected.get("tags")
+						
+						if tags == "table":
+							item_id = treeview.selection()[0]
+							parent_id = treeview.parent(item_id)
+							pdatabase = treeview.item(parent_id)['text']
+							treeview.insert(pdatabase, END, text=table_name, image=table_icon, tags=("table"))
+						else:
+							treeview.insert(treeview.selection()[0], END, text=table_name, image=table_icon, tags=("table"))
+						
 						messagebox.showinfo("Done", "Table '" + table_name + "' has been created")
 					except (MySQLdb.Error, MySQLdb.Warning) as e:
 						error = str(e).strip("(").strip(")")
@@ -691,7 +696,7 @@ def MainProgram(hostname, username, password):
 				elif fieldtype == "Field type" or fieldtype == " ":
 					messagebox.showerror("Error", "Please fill in field boxes")
 				else:
-					treeview.insert('', 'end', values=((fieldname, fieldtype)))
+					tv.insert('', 'end', values=((fieldname, fieldtype)))
 
 					field_array.insert(len(field_array), fieldname + " " + fieldtype)
 
@@ -736,8 +741,7 @@ def MainProgram(hostname, username, password):
 			tv.column('Field name', anchor='w', width=10)
 			tv.heading('Field type', text='Field type', anchor='w')
 			tv.column('Field type', anchor='w', width=10)
-			treeview = tv
-			treeview.pack(fill=BOTH, expand=1)
+			tv.pack(fill=BOTH, expand=1)
 
 			BottomPanel = Frame(newwindow, height=30)
 			BottomPanel.pack(fill=X, expand=1)
@@ -747,9 +751,10 @@ def MainProgram(hostname, username, password):
 
 			newwindow.mainloop()
 
-	def DropDatabase():
-		selected = DatabaseListbox.get(DatabaseListbox.curselection())
-		databasename = str(selected[0])
+	def DropDatabase(event):
+		databasename = cdatabase
+
+		print(databasename)
 
 		if messagebox.askyesno("Sure", "Are you sure you would like to\ndrop database '" + databasename + "'"):
 			try:
@@ -760,8 +765,7 @@ def MainProgram(hostname, username, password):
 				cursor.close()
 				conn.close()
 
-				GetDatabases()
-				messagebox.showinfo("Done", "Database '" + databasename + "' has been dropped")
+				treeview.delete(treeview.selection()[0])
 			except (MySQLdb.Error, MySQLdb.Warning) as e:
 				error = str(e).strip("(").strip(")")
 				datasplit = error.split(", ")
@@ -769,30 +773,32 @@ def MainProgram(hostname, username, password):
 		else:
 			pass
 
-		DropDatabaseButton.config(state='disabled')
+	def DropTable(event):
+		selected = treeview.item(treeview.selection())
 
-	def DropTable():
-		tablename = TableListbox.get(TableListbox.curselection())
+		tablename = selected.get("text")
+		selectedtags = selected.get("tags")
+		
+		if selectedtags[0] == "table":
+			if messagebox.askyesno("Sure", "Are you sure you would like to\ndrop table '" + tablename + "'"):
+				try:
+					conn = MySQLdb.connect(hostname, username, password, cdatabase)
+					cursor = conn.cursor()
+					cursor.execute("drop table " + tablename)
+					conn.commit()
+					cursor.close()
+					conn.close()
 
-		if messagebox.askyesno("Sure", "Are you sure you would like to\ndrop database '" + tablename + "'"):
-			try:
-				conn = MySQLdb.connect(hostname, username, password, database)
-				cursor = conn.cursor()
-				cursor.execute("drop table " + tablename)
-				conn.commit()
-				cursor.close()
-				conn.close()
+					treeview.delete(treeview.selection()[0])
 
-				DatabaseLoad("At this point its just not except because except has a c")
-				messagebox.showinfo("Done", "Table '" + tablename + "' has been dropped")
-			except (MySQLdb.Error, MySQLdb.Warning) as e:
-				error = str(e).strip("(").strip(")")
-				datasplit = error.split(", ")
-				messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
+				except (MySQLdb.Error, MySQLdb.Warning) as e:
+					error = str(e).strip("(").strip(")")
+					datasplit = error.split(", ")
+					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
+			else:
+				pass
 		else:
-			pass
-
-		DropTableButton.config(state='disabled')
+			messagebox.showerror("Error", "Please select a table")
 
 	def UserPanel():
 		userwin = Tk()
@@ -1044,77 +1050,67 @@ def MainProgram(hostname, username, password):
 
 		userwin.mainloop()
 
-	def ExportDatabase():
-		exportwin = Tk()
+	def RunModule(modulename, params):
+		runcommand = modulename + ".init("
+		
+		for item in params:
+			runcommand += "'" + item + "',"
+			
+		runcommand = runcommand[:-1]
+		runcommand += ")"
 
-		exportwin.title("FlameSQL Export database")
-		exportwin.geometry("400x430")
-		exportwin.iconbitmap("Resources/icon.ico")
-		exportwin.resizable(0,0)
+		print(runcommand)
 
-		selectedDatabase = ""
+		exec(runcommand)
 
-		def ExportClose():
-			exportwin.destroy()
+	def ExportDatabase(e):
+		if cdatabase == "":
+			messagebox.showerror("Error", "Please select a database")
+		else:
+			exportlocation = filedialog.asksaveasfilename(filetypes=[("Sqlite3", ".db"), ("All files", "*")], title="Export database", initialfile=cdatabase + ".db")
+			
+			if exportlocation:
+				Export.ExportDatabase(hostname, username, password, cdatabase, exportlocation)
 
-		def ExportCommand():
-			global selectedDatabase
+	def ItemSelect(event):
+		global cdatabase
+		
+		selected = treeview.item(treeview.selection())
+		
+		if selected.get("text") == "":
+			pass
+		else:
+			itemValue = selected.get("text")
+			itemTag = selected.get("tags")
 
-			exportLocation = filedialog.asksaveasfilename(filetypes=(("database file","*.db"),("all files","*.*")), title="Export database")
+			if itemTag[0] == "table":
+				item_id = treeview.selection()[0]
+				parent_id = treeview.parent(item_id)
+				pdatabase = treeview.item(parent_id)['text']
+			
+				cdatabase = pdatabase
 
-			import Lib.Export as exportlib
-			exportlib.ExportDatabase(hostname, username, password, selectedDatabase[0], exportLocation, exportwin)
+				TableLoad(itemValue, pdatabase)
+				
+			elif itemTag[0] == "database":
+				cdatabase = itemValue
 
-		def DatabaseSelect(event):
-			global selectedDatabase
+	# top bar #
+	topbar = Frame(window)
+	topbar.pack(fill=X)
+	
+	buttoncontainer = Frame(topbar, height=35, bd=2, relief=GROOVE)
+	buttoncontainer.pack(fill=X)
+	Frame(topbar, height=10).pack()
+	
+	menubutton(window, "new", ("", 10), NewDatabase).place(x=10, y=2)
+	menubutton(window, "drop", ("", 10), DropDatabase).place(x=45, y=2)
+	menubutton(window, "export", ("", 10), ExportDatabase).place(x=80, y=2)
+	Label(topbar, text="database", font=("", 10), fg="#3f3f3f").place(x=35, y=20)
 
-			try:
-				selectedDatabase = databaseSelect.get(databaseSelect.curselection())
-			except:
-				pass
-
-			if selectedDatabase:
-				databaseLabel.config(text="Database: " + str(selectedDatabase[0]))
-			else:
-				messagebox.showerror("Error", "Please select a database")
-
-		def GetDatabases():
-			conn = MySQLdb.connect(hostname, username, password)
-			cursor = conn.cursor()
-			cursor.execute("show databases")
-			serverreturn = cursor.fetchall()
-			cursor.close()
-			conn.close()
-
-			for item in serverreturn:
-				databaseSelect.insert(END, item)
-
-		HeaderPanel = Frame(exportwin, height=80, bd=2, relief=GROOVE)
-		HeaderPanel.pack(fill=X)
-		Label(exportwin, text="Export database", font=("", 10)).place(x=10, y=10)
-
-		databaseLabel = Label(HeaderPanel, text="Database: no database selected", font=("", 10))
-		databaseLabel.place(x=10, y=50)
-
-		databaseSelect = Listbox(exportwin)
-		databaseSelect.pack(fill=BOTH, expand=1)
-		databaseSelect.bind("<<ListboxSelect>>", DatabaseSelect)
-
-		BottomPanel = Frame(exportwin, height=20, bd=2, relief=GROOVE)
-		BottomPanel.pack(fill=X)
-
-		tkinter2.Button(BottomPanel, text="export", width=15, command=ExportCommand).pack(side=LEFT)
-		tkinter2.Button(BottomPanel, text="cancel", width=15, command=ExportClose).pack(side=LEFT)
-
-		GetDatabases()
-
-		exportwin.mainloop()
-
-	def ImportSQL():
-		sqlfile = filedialog.askopenfilename()
-
-		import Lib.Import as importlib
-		importlib.UploadSQL(hostname, username, password, sqlfile)
+	menubutton(window, "new table", ("", 10), NewTable).place(x=150, y=2)
+	menubutton(window, "drop table", ("", 10), DropTable).place(x=215, y=2)
+	Label(topbar, text="table", font=("", 10), fg="#3f3f3f").place(x=195, y=20)
 
 	# Menu bar #
 	menubar = Menu(window)
@@ -1123,10 +1119,6 @@ def MainProgram(hostname, username, password):
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server stats", command=ServerInfo)
 	servermenu.add_command(label="Export stats", command=ExportServerStats)
-	servermenu.add_separator()
-	servermenu.add_command(label="Export database", command=ExportDatabase)
-	servermenu.add_separator()
-	servermenu.add_command(label="Execute SQL", command=ImportSQL)
 	menubar.add_cascade(label="Server", menu=servermenu)
 
 	optionmenu = Menu(menubar, tearoff=0)
@@ -1137,45 +1129,31 @@ def MainProgram(hostname, username, password):
 	window.configure(menu=menubar)
 
 	# Containers #
-	SidePanel = Frame(window, width=150, bd=2, relief=GROOVE)
+	SidePanel = Frame(window, width=150, bd=0, relief=GROOVE)
 	SidePanel.pack(side=LEFT, fill=Y)
+	
+	treeview = ttk.Treeview(SidePanel)
+	treeview.pack(fill='y', side=LEFT)
+	
+	# load data #
+	
+	conn = MySQLdb.connect(hostname, username, password)
+	cursor = conn.cursor()
+		
+	cursor.execute("show databases;")
+	dblist = cursor.fetchall()
+		
+	for item in dblist:
+		dbitem = treeview.insert("", END, text=item[0], image=database_icon, tags=("database"))
+			
+		cursor.execute("use " + item[0] + ";")
+		cursor.execute("show tables;")
+		tablelist = cursor.fetchall()
+		
+		for item in tablelist:
+			titem = treeview.insert(dbitem, END, text=item[0], image=table_icon, tags=("table"))
 
-	TitlePanel = Frame(SidePanel, height=25, width=150)
-	TitlePanel.pack(fill=X)
-	DBContainer = Frame(SidePanel, height=25, width=150)
-	DBContainer.pack(fill=BOTH, expand=1)
-	TitlePanel2 = Frame(SidePanel, height=25, width=150)
-	TitlePanel2.pack(fill=X)
-	TBContainer = Frame(SidePanel, height=25, width=150)
-	TBContainer.pack(fill=BOTH, expand=1)
-
-	# Database list #
-	DropDatabaseButton = Button(TitlePanel, text="-", font=("", 11), width=5, height=1, bd=0, state='disabled', command=DropDatabase)
-	DropDatabaseButton.pack(side=LEFT, fill=X)
-	Label(TitlePanel, text="Databases", font=("", 10), width=25).pack(side=LEFT, fill=X)
-	Button(TitlePanel, text="+", font=("", 11), width=5, height=1, bd=0, command=NewDatabase).pack(side=LEFT, fill=X)
-	DatabaseListbox = Listbox(DBContainer, exportselection=False, relief=GROOVE, bd=2)
-	DatabaseListbox.pack(fill=BOTH, expand=1, side=LEFT)
-	DatabaseListbox.bind('<<ListboxSelect>>', DatabaseLoad)
-
-	DVScrollbar = Scrollbar(DatabaseListbox)
-	DVScrollbar.pack(side=RIGHT, fill=Y)
-	DVScrollbar.config(command=DatabaseListbox.yview)
-	DatabaseListbox.config(yscrollcommand=DVScrollbar.set)
-
-	# Table list #
-	DropTableButton = Button(TitlePanel2, text="-", font=("", 11), width=5, height=1, bd=0, state='disabled', command=DropTable)
-	DropTableButton.pack(side=LEFT, fill=X)
-	Label(TitlePanel2, text="Tables", font=("", 10), width=25).pack(side=LEFT, fill=X)
-	Button(TitlePanel2, text="+", font=("", 11), width=5, height=1, bd=0, command=NewTable).pack(side=LEFT, fill=X)
-	TableListbox = Listbox(TBContainer, exportselection=False, relief=GROOVE, bd=2)
-	TableListbox.pack(fill=BOTH, expand=1, side=LEFT)
-	TableListbox.bind('<<ListboxSelect>>', TableLoad)
-
-	TVScrollbar = Scrollbar(TableListbox)
-	TVScrollbar.pack(side=RIGHT, fill=Y)
-	TVScrollbar.config(command=TableListbox.yview)
-	TableListbox.config(yscrollcommand=TVScrollbar.set)
+	treeview.bind("<ButtonRelease-1>", ItemSelect)
 
 	# Main workspace #
 	MainWorkspace = Frame(window, bd=2, relief=GROOVE)
@@ -1186,7 +1164,7 @@ def MainProgram(hostname, username, password):
 	BottomPanel.pack(fill=X)
 
 	# Run on GUI load #
-	GetDatabases()
+	#GetDatabases()
 
 	window.mainloop()
 
@@ -1404,9 +1382,9 @@ def Login():
 		PasswordE.bind("<Return>", Connect)
 		SavedListbox.bind('<<ListboxSelect>>', OpenSave)
 
-		tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
-		tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
-		tkinter2.Button(ConnInfoFrame, text="Save", width=12, command=Save).place(x=190, y=200)
+		cb = tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
+		tb = tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
+		sb = tkinter2.Button(ConnInfoFrame, text="Save", width=12, command=Save).place(x=190, y=200)
 
 	TopPanel = PanedWindow(window, height=30, bd=2, relief=RIDGE)
 	TopPanel.pack(fill=X)
