@@ -39,8 +39,9 @@ def Logout(window):
 	Login()
 
 for item in os.listdir("Modules"):
-	exec("import Modules." + item.strip(".py") + " as " + item.strip(".py"))
-	print("import Modules." + item.strip(".py") + " as " + item.strip(".py"))
+	item = item.strip(".py")
+	item = item.strip(".pyc")
+	exec("import Modules." + item + " as " + item)
 
 def MainProgram(hostname, username, password):
 	window = Tk()
@@ -166,8 +167,6 @@ def MainProgram(hostname, username, password):
 			TableListbox.insert(END, "No tables found")
 
 	def TableLoad(tablename, database):
-		#DropTableButton.config(state='normal')
-
 		def InsertRow():
 			insertwindow = Tk()
 
@@ -178,18 +177,22 @@ def MainProgram(hostname, username, password):
 
 			def RowSubmit():
 				item_array = []
+				data_array = []
 				count = 0
 				for item in itemFrame.winfo_children():
 					item_name = str(item)
+
 					if "label" in item_name:
 						pass
 					else:
 						column_data = row_array[count]
-
 						dataSplit = column_data.split("::")
 						data_type = dataSplit[1]
 
 						item_data = item.get()
+						
+						data_array.insert(len(data_array), item_data)
+						
 						if data_type == "text":
 							item_array.insert(len(item_array), "'" + item_data + "'")
 						else:
@@ -233,6 +236,7 @@ def MainProgram(hostname, username, password):
 					messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 
 				TableLoad(tablename, cdatabase)
+
 				insertwindow.destroy()
 
 			Label(insertwindow, text="\nInsert row\n", font=("", 11)).pack(fill=X)
@@ -291,7 +295,29 @@ def MainProgram(hostname, username, password):
 			insertwindow.mainloop()
 
 		def DrawTable(table):
-			def DeleteRow(selection_array):
+			treeview = ""
+		
+			def GetSelectedRow(e):
+				try:
+					selected = treeview.item(treeview.selection())
+					item = treeview.selection()[0]
+					values = treeview.item(item)['values']
+					selection_array = []
+
+					for item in values:
+						item = str(item)
+						selection_array.insert(len(selection_array), item)
+
+					DeleteRowButton.config(state='normal', command=lambda: DeleteRow())
+					EditRowButton.config(state='normal', command=lambda: EditRow())
+					
+					return selection_array
+				except:
+					pass
+		
+			def DeleteRow():
+				selection_array = GetSelectedRow("")
+			
 				if messagebox.askyesno("Sure", "Are you sure you would like to delete this data?"):
 					# Get columns
 					conn = MySQLdb.connect(hostname, username, password, database)
@@ -341,13 +367,15 @@ def MainProgram(hostname, username, password):
 				else:
 					pass
 
-			def EditRow(selection_array):
+			def EditRow(e=None):
 				editwin = Tk()
 
 				editwin.title("FlameSQL Edit row")
 				editwin.geometry("400x430")
 				editwin.resizable(0,0)
 				editwin.iconbitmap("Resources/icon.ico")
+
+				selection_array = GetSelectedRow("")
 
 				def editCommand():
 					sql = "UPDATE " + tablename + " SET "
@@ -402,8 +430,6 @@ def MainProgram(hostname, username, password):
 						cursor.close()
 						conn.commit()
 						conn.close()
-	
-						
 
 						TableLoad(tablename, database)
 
@@ -487,24 +513,6 @@ def MainProgram(hostname, username, password):
 
 				editwin.mainloop()
 
-			def GetSelectedRow(event):
-				try:
-					selected = treeview.item(treeview.selection())
-					item = treeview.selection()[0]
-					values = treeview.item(item)['values']
-					selection_array = []
-
-					for item in values:
-						item = str(item)
-						selection_array.insert(len(selection_array), item)
-
-					DeleteRowButton.config(state='normal', command=lambda: DeleteRow(selection_array))
-					EditRowButton.config(state='normal', command=lambda: EditRow(selection_array))
-					
-					return selection_array
-				except:
-					pass
-
 			column_array = []
 
 			conn = MySQLdb.connect(hostname, username, password, database)
@@ -555,7 +563,8 @@ def MainProgram(hostname, username, password):
 		ControlPanel = PanedWindow(MainWorkspace, height=25, bd=2, relief=GROOVE)
 		ControlPanel.pack(fill=X)
 
-		Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow).pack(side=LEFT)
+		InsertButton = Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow)
+		InsertButton.pack(side=LEFT)
 
 		DeleteRowButton = Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled')
 		DeleteRowButton.pack(side=LEFT)
@@ -599,7 +608,7 @@ def MainProgram(hostname, username, password):
 			cursor.close()
 			conn.close()
 
-			treeview.insert("", END, text=databasename, image=database_icon, tags=("database"))
+			ttreeview.insert("", END, text=databasename, image=database_icon, tags=("database"))
 
 		Label(newwindow, text="New database", font=("", 10)).place(x=10, y=10)
 		DatabaseE = Entry(newwindow, width=30, bd=2, relief=RIDGE)
@@ -667,17 +676,17 @@ def MainProgram(hostname, username, password):
 
 						newwindow.destroy()
 						
-						selected = treeview.item(treeview.selection())
+						selected = ttreeview.item(ttreeview.selection())
 						
 						tags = selected.get("tags")
 						
 						if tags == "table":
-							item_id = treeview.selection()[0]
-							parent_id = treeview.parent(item_id)
-							pdatabase = treeview.item(parent_id)['text']
-							treeview.insert(pdatabase, END, text=table_name, image=table_icon, tags=("table"))
+							item_id = ttreeview.selection()[0]
+							parent_id = ttreeview.parent(item_id)
+							pdatabase = ttreeview.item(parent_id)['text']
+							ttreeview.insert(pdatabase, END, text=table_name, image=table_icon, tags=("table"))
 						else:
-							treeview.insert(treeview.selection()[0], END, text=table_name, image=table_icon, tags=("table"))
+							ttreeview.insert(ttreeview.selection()[0], END, text=table_name, image=table_icon, tags=("table"))
 						
 						messagebox.showinfo("Done", "Table '" + table_name + "' has been created")
 					except (MySQLdb.Error, MySQLdb.Warning) as e:
@@ -765,7 +774,7 @@ def MainProgram(hostname, username, password):
 				cursor.close()
 				conn.close()
 
-				treeview.delete(treeview.selection()[0])
+				ttreeview.delete(ttreeview.selection()[0])
 			except (MySQLdb.Error, MySQLdb.Warning) as e:
 				error = str(e).strip("(").strip(")")
 				datasplit = error.split(", ")
@@ -774,7 +783,7 @@ def MainProgram(hostname, username, password):
 			pass
 
 	def DropTable(event):
-		selected = treeview.item(treeview.selection())
+		selected = ttreeview.item(ttreeview.selection())
 
 		tablename = selected.get("text")
 		selectedtags = selected.get("tags")
@@ -789,7 +798,7 @@ def MainProgram(hostname, username, password):
 					cursor.close()
 					conn.close()
 
-					treeview.delete(treeview.selection()[0])
+					ttreeview.delete(ttreeview.selection()[0])
 
 				except (MySQLdb.Error, MySQLdb.Warning) as e:
 					error = str(e).strip("(").strip(")")
@@ -1075,7 +1084,7 @@ def MainProgram(hostname, username, password):
 	def ItemSelect(event):
 		global cdatabase
 		
-		selected = treeview.item(treeview.selection())
+		selected = ttreeview.item(ttreeview.selection())
 		
 		if selected.get("text") == "":
 			pass
@@ -1084,9 +1093,9 @@ def MainProgram(hostname, username, password):
 			itemTag = selected.get("tags")
 
 			if itemTag[0] == "table":
-				item_id = treeview.selection()[0]
-				parent_id = treeview.parent(item_id)
-				pdatabase = treeview.item(parent_id)['text']
+				item_id = ttreeview.selection()[0]
+				parent_id = ttreeview.parent(item_id)
+				pdatabase = ttreeview.item(parent_id)['text']
 			
 				cdatabase = pdatabase
 
@@ -1119,6 +1128,7 @@ def MainProgram(hostname, username, password):
 	servermenu = Menu(menubar, tearoff=0)
 	servermenu.add_command(label="Server stats", command=ServerInfo)
 	servermenu.add_command(label="Export stats", command=ExportServerStats)
+	servermenu.add_command(label="Import", command=lambda: Import.ExecuteSQL(hostname, username, password))
 	menubar.add_cascade(label="Server", menu=servermenu)
 
 	optionmenu = Menu(menubar, tearoff=0)
@@ -1132,8 +1142,8 @@ def MainProgram(hostname, username, password):
 	SidePanel = Frame(window, width=150, bd=0, relief=GROOVE)
 	SidePanel.pack(side=LEFT, fill=Y)
 	
-	treeview = ttk.Treeview(SidePanel)
-	treeview.pack(fill='y', side=LEFT)
+	ttreeview = ttk.Treeview(SidePanel)
+	ttreeview.pack(fill='y', side=LEFT)
 	
 	# load data #
 	
@@ -1144,16 +1154,16 @@ def MainProgram(hostname, username, password):
 	dblist = cursor.fetchall()
 		
 	for item in dblist:
-		dbitem = treeview.insert("", END, text=item[0], image=database_icon, tags=("database"))
+		dbitem = ttreeview.insert("", END, text=item[0], image=database_icon, tags=("database"))
 			
 		cursor.execute("use " + item[0] + ";")
 		cursor.execute("show tables;")
 		tablelist = cursor.fetchall()
 		
 		for item in tablelist:
-			titem = treeview.insert(dbitem, END, text=item[0], image=table_icon, tags=("table"))
+			titem = ttreeview.insert(dbitem, END, text=item[0], image=table_icon, tags=("table"))
 
-	treeview.bind("<ButtonRelease-1>", ItemSelect)
+	ttreeview.bind("<ButtonRelease-1>", ItemSelect)
 
 	# Main workspace #
 	MainWorkspace = Frame(window, bd=2, relief=GROOVE)

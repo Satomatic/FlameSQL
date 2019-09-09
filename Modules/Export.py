@@ -8,73 +8,65 @@ import os
 
 def ExportDatabase(hostname, username, password, databasename, location):
 	try:
+		connection = MySQLdb.connect(hostname, username, password, databasename)
+		cursor = connection.cursor()
+
 		# create database file #
 		database = sqlite3.connect(location)
 		dbcursor = database.cursor()
 
-		conn = MySQLdb.connect(hostname, username, password, databasename)
-		cursor = conn.cursor()
-		cursor.execute("show tables")
-		serverTables = cursor.fetchall()
+		# get tables from database #
+		cursor.execute("show tables;")
+		tablelist = cursor.fetchall()
 
-		for item in serverTables:
-			item = item[0]
+		# create tables #
+		for item in tablelist:
+			fields = []
+			types = []
+			tablename = item[0]
+
+			# get columns #
+			cursor.execute("DESCRIBE " + tablename)
+			tablefields = cursor.fetchall()
+
+			for item in tablefields:
+				fields.insert(len(fields), item[0])
+				types.insert(len(types), item[1])
 
 			# create table #
-			sql = "create table " + item + "("
-			sql2 = "insert into " + item + "("
-
-			cursor.execute("DESCRIBE " + item)
-			tableColumns = cursor.fetchall()
-
-			objectArray = []
-
+			sql = "create table " + tablename + "("
 			count = 0
-			for column in tableColumns:
-				count = count + 1
+			for item in fields:
+				sql += fields[count] + " " + types[count] + ","
 
-				objectArray.insert(len(objectArray), column[1])
+				count += 1
 
-				if count == len(tableColumns):
-					sql = sql + column[0] + " " + column[1]
-					sql2 = sql2 + column[0]
-				else:
-					sql = sql + column[0] + " " + column[1] + ", "
-					sql2 = sql2 + column[0] + ", "
-
-			sql += ")"
-			sql2 += ") values ("
+			sql = sql[:-1]
+			sql += ");"
 
 			dbcursor.execute(sql)
 
-			# transfer data #
-			cursor.execute("select * from " + item)
-			datareturn = cursor.fetchall()
+			# insert table data #
+			cursor.execute("select * from " + tablename)
+			tabledata = cursor.fetchall()
 
-			print(datareturn)
+			for row in tabledata:
+				sql2 = "insert into " + tablename + " values ("
 
-			for row in datareturn:
-				count = 0
-				for data in row:
-					print(data)
-					print(objectArray[count])
-
-					if "text" in objectArray[count]:
-						sql2 = sql2 + "'" + data + "', "
+				for col in row:
+					if isinstance(col, int):
+						sql2 += str(col)
 					else:
-						sql2 = sql2 + str(data) + ", "
+						sql2 += "'" + str(col) + "'"
 
-					count = count + 1
+					sql2 += ", "
 
-				sql2 = sql2[:-2] + ")"
-				print(sql2)
+				sql2 = sql2[:-2]
+				sql2 += ");"
 
 				dbcursor.execute(sql2)
 
-		cursor.close()
-		conn.close()
-
-		dbcursor.close()
+		connection.close()
 		database.commit()
 		database.close()
 

@@ -1,3 +1,4 @@
+import tkinter.ttk as ttk
 from tkinter import *
 
 def menubutton(frame=None, text=None, Font=None, command=None):
