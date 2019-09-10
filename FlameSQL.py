@@ -13,13 +13,13 @@ import PIL
 import sys
 import os
 
-def Exit(hostname, username, password):
+def Exit(hostname, username, password, port):
 	if messagebox.askyesno("Exit", "Are you sure you would\nlike to exit?"):
 		# write session #
 		database = sqlite3.connect("Data/saved.db")
 		cursor = database.cursor()
 		cursor.execute("delete from session where id=1;")
-		cursor.execute("insert into session (id, hostname, username, password) values (1, '" + hostname + "','" + username + "', '" + password + "')")
+		cursor.execute("insert into session values (1, '" + hostname + "','" + username + "', '" + password + "', " + str(port) + ");")
 		database.commit()
 		database.close()
 
@@ -43,14 +43,15 @@ for item in os.listdir("Modules"):
 	item = item.strip(".pyc")
 	exec("import Modules." + item + " as " + item)
 
-def MainProgram(hostname, username, password):
+def MainProgram(hostname, username, password, port):
 	window = Tk()
 
 	window.title("FlameSQL :: " + hostname)
 	window.geometry("1280x720")
 	window.iconbitmap("Resources/icon.ico")
-	window.protocol('WM_DELETE_WINDOW', lambda: Exit(hostname, username, password))
-	
+	window.protocol('WM_DELETE_WINDOW', lambda: Exit(hostname, username, password, port))
+	window.configure(bg="#ffffff")
+
 	# global variables #
 	global ctable
 	global cdatabase
@@ -77,7 +78,7 @@ def MainProgram(hostname, username, password):
 			def ServerShutdown():
 				if messagebox.askyesno("Shutdown", "Are you sure you would like\nto shut down the server?"):
 					try:
-						conn = MySQLdb.connect(hostname, username, password)
+						conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 						conn.shutdown()
 						conn.close()
 					except (MySQLdb.Error, MySQLdb.Warning) as e:
@@ -90,7 +91,7 @@ def MainProgram(hostname, username, password):
 					pass
 
 			# Get server stats
-			conn = MySQLdb.connect(hostname, username, password)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 			statRaw = conn.stat()
 			conn.close()
 
@@ -127,7 +128,7 @@ def MainProgram(hostname, username, password):
 		exportlocation = filedialog.asksaveasfilename(title="Export stats", filetypes = (("all files", "*.*"), ("text file", "*.txt")))
 
 		if exportlocation:
-			conn = MySQLdb.connect(hostname, username, password)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 			cursor = conn.cursor()
 			rawStats = conn.stat()
 
@@ -153,7 +154,7 @@ def MainProgram(hostname, username, password):
 		global database
 		database = selected
 
-		conn = MySQLdb.connect(hostname, username, password, selected)
+		conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=selected)
 		cursor = conn.cursor()
 		cursor.execute("show tables")
 		server_return = cursor.fetchall()
@@ -167,7 +168,7 @@ def MainProgram(hostname, username, password):
 			TableListbox.insert(END, "No tables found")
 
 	def TableLoad(tablename, database):
-		def InsertRow():
+		def InsertRow(e=None):
 			insertwindow = Tk()
 
 			insertwindow.title("Insert Row")
@@ -225,7 +226,7 @@ def MainProgram(hostname, username, password):
 				print(sql_command)
 
 				try:
-					conn = MySQLdb.connect(hostname, username, password, database)
+					conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=database)
 					cursor = conn.cursor()
 					cursor.execute(sql_command)
 					conn.commit()
@@ -243,7 +244,7 @@ def MainProgram(hostname, username, password):
 			MainContainer = Frame(insertwindow, bd=2, relief=RIDGE)
 			MainContainer.pack(fill=BOTH, expand=1)
 
-			conn = MySQLdb.connect(hostname, username, password, cdatabase)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=cdatabase)
 			cursor = conn.cursor()
 			cursor.execute("show columns from " + tablename)
 			server_return = cursor.fetchall()
@@ -296,7 +297,9 @@ def MainProgram(hostname, username, password):
 
 		def DrawTable(table):
 			treeview = ""
-		
+
+			m_insert.bind("<Button-1>", InsertRow)
+
 			def GetSelectedRow(e):
 				try:
 					selected = treeview.item(treeview.selection())
@@ -308,19 +311,19 @@ def MainProgram(hostname, username, password):
 						item = str(item)
 						selection_array.insert(len(selection_array), item)
 
-					DeleteRowButton.config(state='normal', command=lambda: DeleteRow())
-					EditRowButton.config(state='normal', command=lambda: EditRow())
-					
+					m_delete.bind("<Button-1>", DeleteRow)
+					m_alter.bind("<Button-1>", EditRow)
+
 					return selection_array
 				except:
 					pass
 		
-			def DeleteRow():
+			def DeleteRow(e=None):
 				selection_array = GetSelectedRow("")
 			
 				if messagebox.askyesno("Sure", "Are you sure you would like to delete this data?"):
 					# Get columns
-					conn = MySQLdb.connect(hostname, username, password, database)
+					conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=database)
 					cursor = conn.cursor()
 					cursor.execute("show columns from " + table)
 					server_return = cursor.fetchall()
@@ -424,7 +427,7 @@ def MainProgram(hostname, username, password):
 					print(sql)
 
 					try:
-						conn = MySQLdb.connect(hostname, username, password, database)
+						conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=database)
 						cursor = conn.cursor()
 						cursor.execute(sql)
 						cursor.close()
@@ -461,7 +464,7 @@ def MainProgram(hostname, username, password):
 				objectArea = Frame(scrollArea)
 
 				# I still hate scrolling frames in tkinter :/ #
-				conn = MySQLdb.connect(hostname, username, password, database)
+				conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=database)
 				cursor = conn.cursor()
 				cursor.execute("show columns from " + tablename)
 				serverreturn = cursor.fetchall()
@@ -515,7 +518,7 @@ def MainProgram(hostname, username, password):
 
 			column_array = []
 
-			conn = MySQLdb.connect(hostname, username, password, database)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=database)
 			cursor = conn.cursor()
 
 			# Get column names #
@@ -555,24 +558,11 @@ def MainProgram(hostname, username, password):
 		ClearPanel(MainWorkspace)
 
 		# Top Panel #
-		TopPanel = Frame(MainWorkspace, height=25, bd=2, relief=GROOVE)
+		TopPanel = Frame(MainWorkspace, height=25, bd=2, relief=GROOVE, bg="#ffffff")
 		TopPanel.pack(fill=X)
 		Label(TopPanel, text="Table name: " + tablename, font=("", 10)).pack(side=LEFT)
 
-		# Control Panel #
-		ControlPanel = PanedWindow(MainWorkspace, height=25, bd=2, relief=GROOVE)
-		ControlPanel.pack(fill=X)
-
-		InsertButton = Button(ControlPanel, text="Insert row", width=10, bd=0, command=InsertRow)
-		InsertButton.pack(side=LEFT)
-
-		DeleteRowButton = Button(ControlPanel, text="Delete row", width=10, bd=0, state='disabled')
-		DeleteRowButton.pack(side=LEFT)
-
-		EditRowButton = Button(ControlPanel, text="Edit row", width=10, bd=0, state='disabled')
-		EditRowButton.pack(side=LEFT)
-
-		Button(ControlPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad(tablename, cdatabase)).pack(side=RIGHT)
+		Button(TopPanel, text="Refresh", width=10, bd=0, command=lambda: TableLoad(tablename, cdatabase)).pack(side=RIGHT)
 
 		DrawTable(tablename)
 
@@ -591,7 +581,7 @@ def MainProgram(hostname, username, password):
 		def DatabaseCreate():
 			databasename = DatabaseE.get()
 
-			conn = MySQLdb.connect(hostname, username, password)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 			cursor = conn.cursor()
 
 			try:
@@ -665,7 +655,7 @@ def MainProgram(hostname, username, password):
 					sql_string = "create table " + table_name + " (" + field_string + ")"
 
 					try:
-						conn = MySQLdb.connect(hostname, username, password, str(database))
+						conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=str(database))
 						cursor = conn.cursor()
 
 						cursor.execute(sql_string)
@@ -767,7 +757,7 @@ def MainProgram(hostname, username, password):
 
 		if messagebox.askyesno("Sure", "Are you sure you would like to\ndrop database '" + databasename + "'"):
 			try:
-				conn = MySQLdb.connect(hostname, username, password)
+				conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 				cursor = conn.cursor()
 				cursor.execute("drop database " + databasename)
 				conn.commit()
@@ -791,7 +781,7 @@ def MainProgram(hostname, username, password):
 		if selectedtags[0] == "table":
 			if messagebox.askyesno("Sure", "Are you sure you would like to\ndrop table '" + tablename + "'"):
 				try:
-					conn = MySQLdb.connect(hostname, username, password, cdatabase)
+					conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=cdatabase)
 					cursor = conn.cursor()
 					cursor.execute("drop table " + tablename)
 					conn.commit()
@@ -828,7 +818,7 @@ def MainProgram(hostname, username, password):
 							userSplit = user.split("@")
 							userName = userSplit[0]
 							userHost = userSplit[1]
-							conn = MySQLdb.connect(hostname, username, password)
+							conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 							cursor = conn.cursor()
 							cursor.execute("DROP USER '" + userName + "'@'" + userHost + "'")
 							conn.commit()
@@ -887,7 +877,7 @@ def MainProgram(hostname, username, password):
 							try:
 								count = 0
 
-								conn = MySQLdb.connect(hostname, username, password)
+								conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 								cursor = conn.cursor()
 								sql = "create user '" + newUsername + "'@'" + newHostname + "' identified by '" + newPassword + "'"
 
@@ -1033,7 +1023,7 @@ def MainProgram(hostname, username, password):
 			ContentFrame.pack(fill=BOTH, expand=1)
 
 			# Load users #
-			conn = MySQLdb.connect(hostname, username, password)
+			conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 			cursor = conn.cursor()
 			cursor.execute("select * from mysql.user")
 			server_return = cursor.fetchall()
@@ -1108,18 +1098,26 @@ def MainProgram(hostname, username, password):
 	topbar = Frame(window)
 	topbar.pack(fill=X)
 	
-	buttoncontainer = Frame(topbar, height=35, bd=2, relief=GROOVE)
+	buttoncontainer = Frame(topbar, height=35, bd=2, relief=GROOVE, bg="#ffffff")
 	buttoncontainer.pack(fill=X)
-	Frame(topbar, height=10).pack()
+	Frame(topbar, height=10, bg="#ffffff").pack()
 	
 	menubutton(window, "new", ("", 10), NewDatabase).place(x=10, y=2)
 	menubutton(window, "drop", ("", 10), DropDatabase).place(x=45, y=2)
 	menubutton(window, "export", ("", 10), ExportDatabase).place(x=80, y=2)
-	Label(topbar, text="database", font=("", 10), fg="#3f3f3f").place(x=35, y=20)
+	Label(topbar, text="database", font=("", 10), fg="#3f3f3f", bg="#ffffff").place(x=35, y=20)
 
 	menubutton(window, "new table", ("", 10), NewTable).place(x=150, y=2)
 	menubutton(window, "drop table", ("", 10), DropTable).place(x=215, y=2)
-	Label(topbar, text="table", font=("", 10), fg="#3f3f3f").place(x=195, y=20)
+	Label(topbar, text="table", font=("", 10), fg="#3f3f3f", bg="#ffffff").place(x=195, y=20)
+
+	m_insert = menubutton(window, "insert", ("", 10))
+	m_insert.place(x=300, y=2)
+	m_alter = menubutton(window, "edit", ("", 10))
+	m_alter.place(x=340, y=2)
+	m_delete = menubutton(window, "delete", ("", 10))
+	m_delete.place(x=370, y=2)
+	Label(topbar, text="data", font=("", 10), fg="#3f3f3f", bg="#ffffff").place(x=340, y=20)
 
 	# Menu bar #
 	menubar = Menu(window)
@@ -1135,7 +1133,7 @@ def MainProgram(hostname, username, password):
 	menubar.add_cascade(label="Options", menu=optionmenu)
 
 	menubar.add_command(label="Logout", command=lambda: Logout(window))
-	menubar.add_command(label="Exit", command=lambda: Exit(hostname, username, password))
+	menubar.add_command(label="Exit", command=lambda: Exit(hostname, username, password, port))
 	window.configure(menu=menubar)
 
 	# Containers #
@@ -1146,8 +1144,7 @@ def MainProgram(hostname, username, password):
 	ttreeview.pack(fill='y', side=LEFT)
 	
 	# load data #
-	
-	conn = MySQLdb.connect(hostname, username, password)
+	conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 	cursor = conn.cursor()
 		
 	cursor.execute("show databases;")
@@ -1172,9 +1169,6 @@ def MainProgram(hostname, username, password):
 	# Bottom panel
 	BottomPanel = Frame(window, height=40, bd=2, relief=GROOVE)
 	BottomPanel.pack(fill=X)
-
-	# Run on GUI load #
-	#GetDatabases()
 
 	window.mainloop()
 
@@ -1209,11 +1203,13 @@ def Login():
 		global HostnameE
 		global UsernameE
 		global PasswordE
+		global PortE
 
 		def CheckInfo():
 			hostname = HostnameE.get()
 			username = UsernameE.get()
 			password = PasswordE.get()
+			port = PortE.get()
 
 			if hostname == "Hostname" or hostname == " ":
 				info = False
@@ -1229,36 +1225,38 @@ def Login():
 
 			return returnstring
 
-		def Connect(event, HostnameE, UsernameE, PasswordE):
+		def Connect(event, HostnameE, UsernameE, PasswordE, PortE):
 			hostname = HostnameE.get()
 			username = UsernameE.get()
 			password = PasswordE.get()
+			port = PortE.get()
 
 			try:
-				connection = MySQLdb.connect(hostname, username, password)
+				connection = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 				cursor = connection.cursor()
 				cursor.close()
 				connection.close()
 
 				window.destroy()
 
-				MainProgram(hostname, username, password)
+				MainProgram(hostname, username, password, port)
 			except (MySQLdb.Error, MySQLdb.Warning) as e:
 				error = str(e).strip("(").strip(")")
 				datasplit = error.split(", ")
 				messagebox.showerror("Error", datasplit[0] + "\n" + datasplit[1])
 
-		def TestConnection(HostnameE, UsernameE, PasswordE):
+		def TestConnection(HostnameE, UsernameE, PasswordE, PortE):
 			hostname = HostnameE.get()
 			username = UsernameE.get()
 			password = PasswordE.get()
+			port = PortE.get()
 
 			try:
-				connection = MySQLdb.connect(hostname, username, password)
+				connection = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 				cursor = connection.cursor()
 				cursor.close()
 				connection.close()
-				messagebox.showinfo("Done", "Succesfully connected to '" + hostname + "'")
+				messagebox.showinfo("Done", "Succesfully connected to " + username + "@" + hostname)
 			except (MySQLdb.Error, MySQLdb.Warning) as e:
 				error = str(e).strip("(").strip(")")
 				datasplit = error.split(", ")
@@ -1273,11 +1271,15 @@ def Login():
 				hostname = HostnameE.get()
 				username = UsernameE.get()
 				password = PasswordE.get()
+				port = PortE.get()
+
+				if port == "Port 3306":
+					port = 3306
 
 				timestamp = int(time.time())
 				database = sqlite3.connect("Data/saved.db")
 				cursor = database.cursor()
-				cursor.execute("insert into saved(id, hostname, username, password) values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "')")
+				cursor.execute("insert into saved values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "'," + str(port) + ");")
 				cursor.close()
 				database.commit()
 				database.close()
@@ -1293,13 +1295,16 @@ def Login():
 				hostname = HostnameE.get()
 				username = UsernameE.get()
 				password = PasswordE.get()
+				port = PortE.get()
+
+				if port == "":
+					port = 3306
 
 				timestamp = int(time.time())
 
 				try:
 					sql = "delete from saved where hostname='" + hostname + "' and username='" + username + "'"
-					print(sql)
-					sql2 = "insert into saved(id, hostname, username, password) values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "')"
+					sql2 = "insert into saved values (" + str(timestamp) + ", '" + hostname + "', '" + username + "', '" + password + "'," + str(port) + ");"
 					database = sqlite3.connect("Data/saved.db")
 					cursor = database.cursor()
 					cursor.execute(sql)
@@ -1318,6 +1323,7 @@ def Login():
 				hostname = HostnameE.get()
 				username = UsernameE.get()
 				password = PasswordE.get()
+				port = PortE.get()
 
 				try:
 					sql = "delete from saved where hostname='" + hostname + "' and username='" + username + "' and password='" + password + "'"
@@ -1345,35 +1351,44 @@ def Login():
 
 			for item in dbreturn:
 				password = item[3]
+				port = item[4]
 
 			Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
-			HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+			HostnameE = Entry(ConnInfoFrame, width=29, bd=2, relief=GROOVE, font=("", 10))
 			HostnameE.place(x=100, y=10)
 
+			PortE = Entry(ConnInfoFrame, width=9, bd=2, relief=GROOVE, font=("", 10))
+			PortE.place(x=316, y=10)
+
 			Label(ConnInfoFrame, text="Username", font=("", 11)).place(x=10, y=60)
-			UsernameE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10))
+			UsernameE = Entry(ConnInfoFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
 			UsernameE.place(x=100, y=60)
 
 			Label(ConnInfoFrame, text="Password", font=("", 11)).place(x=10, y=110)
-			PasswordE = Entry(ConnInfoFrame, width=40, bd=2, relief=RIDGE, font=("", 10), show="*")
+			PasswordE = Entry(ConnInfoFrame, width=40, bd=2, relief=GROOVE, font=("", 10), show="*")
 			PasswordE.place(x=100, y=110)
 
 			HostnameE.insert(END, serverip)
 			UsernameE.insert(END, username)
 			PasswordE.insert(END, password)
+			PortE.insert(END, port)
 
-			tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
-			tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
+			tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE, PortE)).place(x=10, y=200)
+			tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE, PortE)).place(x=100, y=200)
 			tkinter2.Button(ConnInfoFrame, text="Update", width=12, command=UpdateSave).place(x=190, y=200)
 			tkinter2.Button(ConnInfoFrame, text="Delete", width=12, command=DeleteSave).place(x=280, y=200)
 
 		global HostnameE
 		global UsernameE
 		global PasswordE
+		global PortE
 
 		Label(ConnInfoFrame, text="Hostname", font=("", 11)).place(x=10, y=10)
-		HostnameE = Entry(ConnInfoFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
+		HostnameE = Entry(ConnInfoFrame, width=29, bd=2, relief=GROOVE, font=("", 10))
 		HostnameE.place(x=100, y=10)
+
+		PortE = Entry(ConnInfoFrame, width=9, bd=2, relief=GROOVE, font=("", 10))
+		PortE.place(x=316, y=10)
 
 		Label(ConnInfoFrame, text="Username", font=("", 11)).place(x=10, y=60)
 		UsernameE = Entry(ConnInfoFrame, width=40, bd=2, relief=GROOVE, font=("", 10))
@@ -1384,16 +1399,18 @@ def Login():
 		PasswordE.place(x=100, y=110)
 
 		add_placeholder_to(HostnameE, "Hostname", "")
+		add_placeholder_to(PortE, "Port 3306", "")
 		add_placeholder_to(UsernameE, "Username", "")
 		add_placeholder_to(PasswordE, "Password", "*")
 
 		HostnameE.bind("<Return>", Connect)
+		PortE.bind("<Return>", Connect)
 		UsernameE.bind("<Return>", Connect)
 		PasswordE.bind("<Return>", Connect)
 		SavedListbox.bind('<<ListboxSelect>>', OpenSave)
 
-		cb = tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE)).place(x=10, y=200)
-		tb = tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE)).place(x=100, y=200)
+		cb = tkinter2.Button(ConnInfoFrame, text="Connect", width=12, command=lambda: Connect("Reeeeee XD", HostnameE, UsernameE, PasswordE, PortE)).place(x=10, y=200)
+		tb = tkinter2.Button(ConnInfoFrame, text="Test", width=12, command=lambda: TestConnection(HostnameE, UsernameE, PasswordE, PortE)).place(x=100, y=200)
 		sb = tkinter2.Button(ConnInfoFrame, text="Save", width=12, command=Save).place(x=190, y=200)
 
 	TopPanel = PanedWindow(window, height=30, bd=2, relief=RIDGE)
@@ -1424,15 +1441,16 @@ if os.path.isfile("Data/saved.db"):
 			hostname = item[1]
 			username = item[2]
 			password = item[3]
+			port = item[4]
 
 			# test connection #
 			try:
-				conn = MySQLdb.connect(hostname, username, password)
+				conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
 				conn.close()
 
 				database.close()
 
-				MainProgram(hostname, username, password)
+				MainProgram(hostname, username, password, port)
 
 			except Exception as e:
 
@@ -1451,8 +1469,8 @@ if os.path.isfile("Data/saved.db"):
 else:
 	database = sqlite3.connect("Data/saved.db")
 	cursor = database.cursor()
-	cursor.execute("create table saved (id INTEGER, hostname TEXT, username TEXT, password TEXT);")
-	cursor.execute("create table session (id INTEGER, hostname TEXT, username TEXT, password TEXT);")
+	cursor.execute("create table saved (id INTEGER, hostname TEXT, username TEXT, password TEXT, port INTEGER);")
+	cursor.execute("create table session (id INTEGER, hostname TEXT, username TEXT, password TEXT, port INTEGER);")
 	cursor.close()
 	database.commit()
 

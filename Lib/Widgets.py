@@ -2,7 +2,7 @@ import tkinter.ttk as ttk
 from tkinter import *
 
 def menubutton(frame=None, text=None, Font=None, command=None):
-	buttonL = Label(frame, text=text, font=Font)
+	buttonL = Label(frame, text=text, font=Font, bg="#ffffff")
 	
 	def highlight(e):
 		buttonL.config(bg="#cce8ff")

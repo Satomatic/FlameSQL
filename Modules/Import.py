@@ -16,7 +16,7 @@ def UploadSQL(hostname, username, password):
         sqldatasplit = sqldata.split(";")
 
         try:
-            conn = MySQLdb.connect(hostname, username, password)
+            conn = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
             cursor = conn.cursor()
 
             for item in sqldatasplit:
@@ -41,7 +41,7 @@ def ExecuteSQL(hostname, username, password):
         return 0
 
     if os.path.isfile(filelocation):
-        errors = ["error 404", "error 839", "error 433"]
+        errors = []
 
         sqlfile = open(filelocation)
         sqldata = sqlfile.read()
@@ -50,7 +50,7 @@ def ExecuteSQL(hostname, username, password):
         sqldata = sqldata.replace("\n", "")
         sqldatasplit = sqldata.split(";")
 
-        connection = MySQLdb.connect(hostname, username, password)
+        connection = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port))
         cursor = connection.cursor()
 
         for item in sqldatasplit:

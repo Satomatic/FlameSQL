@@ -8,7 +8,7 @@ import os
 
 def ExportDatabase(hostname, username, password, databasename, location):
 	try:
-		connection = MySQLdb.connect(hostname, username, password, databasename)
+		connection = MySQLdb.connect(host=hostname, user=username, passwd=password, port=int(port), db=databasename)
 		cursor = connection.cursor()
 
 		# create database file #
